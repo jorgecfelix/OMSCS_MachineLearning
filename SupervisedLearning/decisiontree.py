@@ -5,8 +5,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import tree
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import GradientBoostingClassifier
+from sklearn.ensemble import AdaBoostClassifier
 from sklearn.model_selection import train_test_split
-from helper import read_csv_data, split_data
+from helper import read_csv_data, split_data, format_phishing_data
 
 
 def run_decision_tree(X, y, test_size=0.60, ccp_alpha=0.0):
@@ -42,7 +44,7 @@ def complex_post_prune_tree(X, y):
     # NOTE: The higher the alpha the more the tree is pruned
     decision_tree = DecisionTreeClassifier(random_state=0)
     path = decision_tree.cost_complexity_pruning_path(X_train, y_train)
-    ccp_alphas, impurities = path.ccp_alphas, path.impurities
+    ccp_alphas, _ = path.ccp_alphas, path.impurities
 
     trees = []
     for ccp_alpha in ccp_alphas:
@@ -66,26 +68,76 @@ def complex_post_prune_tree(X, y):
 
     return trees, best_ccp_alpha
 
+
 def plot_decision_tree(decision_tree):
     _, ax = plt.subplots(figsize=(10, 10))  # whatever size you want
     tree.plot_tree(decision_tree, ax=ax)
     plt.show()
 
 
+def ada_boosted_tree(X, y):
+    """ Function using scikit-learn's AdaBoostClassifier """
+    print("\n :: Ada Boosted Tree")
+
+    # split data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+
+    boosted_tree = AdaBoostClassifier(DecisionTreeClassifier(max_depth=5),
+                         algorithm="SAMME",
+                         n_estimators=1)
+
+    boosted_tree.fit(X_train, y_train)
+
+    test_accuracy = boosted_tree.score(X_test, y_test)
+    train_accuracy = boosted_tree.score(X_train, y_train)
+
+    print(f" Number of training samples {X_train.shape[0]}")
+    print(f" Number of test samples {X_test.shape[0]}")
+    print(f" Accuracy of test data : {test_accuracy}")
+    print(f" Accuracy of train data : {train_accuracy}\n")
+    return boosted_tree
+
+
+def gradient_boosted_tree(X, y):
+    print("\n :: Gradient Boosted Tree")
+    # split data
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+
+
+    boosted_tree = GradientBoostingClassifier(n_estimators=2, learning_rate=1.0, max_depth=2, random_state=0)
+    boosted_tree.fit(X_train, y_train)
+
+    test_accuracy = boosted_tree.score(X_test, y_test)
+    train_accuracy = boosted_tree.score(X_train, y_train)
+
+    print(f" Number of training samples {X_train.shape[0]}")
+    print(f" Number of test samples {X_test.shape[0]}")
+    print(f" Accuracy of test data : {test_accuracy}")
+    print(f" Accuracy of train data : {train_accuracy}\n")
+
+    return boosted_tree
+    
+
+
 if __name__ == "__main__":
 
-    dataset = read_csv_data(sys.argv[1], delimiter=";")
-    X, y = split_data(dataset, class_attr="quality")
+    # dataset = read_csv_data(sys.argv[1], delimiter=",", encode=False)
+    # X, y = split_data(dataset, class_attr="class")
 
+    # get phising data
+    X, y = format_phishing_data(sys.argv[1])
     test_sizes = np.arange(.95, .05, -.05)
     
     num_samples_list = []
     accuracy_data = []
     trees, ccp_alpha = complex_post_prune_tree(X, y)
 
-    #for test_size in test_sizes:
-    #    num_samples, test_accuracy, train_accuracy = sl.run_decision_tree(test_size=test_size, ccp_alpha=ccp_alpha)
-    #    num_samples_list.append(num_samples)
-    #    accuracy_data.append(test_accuracy)
+    gradient_boosted_tree(X, y)
+    ada_boosted_tree(X, y)
+
+    for test_size in test_sizes:
+        num_samples, test_accuracy, train_accuracy = run_decision_tree(X, y, test_size=test_size, ccp_alpha=ccp_alpha)
+        num_samples_list.append(num_samples)
+        accuracy_data.append(test_accuracy)
 
     #sl.plot_accuracy_vs_training_samples(num_samples_list, accuracy_data)
