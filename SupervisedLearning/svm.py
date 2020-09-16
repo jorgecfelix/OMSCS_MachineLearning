@@ -7,6 +7,8 @@ from sklearn.model_selection import train_test_split
 import helper
 from sklearn import svm
 
+FIGURE_NUM = 0
+
 def run_svm(X, y, num_samples=None, kernel='rbf', max_iter=10):
     print("\n :: SVM Classifier")
 
@@ -47,13 +49,13 @@ def get_validation_curve(file_name, dataset_to_use, kernel):
         train_accuracy_data.append(train_accuracy)
     
     # get learning curves
-    plt.figure(0)
+    plt.figure()
     plt.plot(max_iter, train_accuracy_data, "-", label=f"train {kernel}")
     plt.plot(max_iter, test_accuracy_data, "-", label=f"test {kernel}")
     plt.xlabel("max iterations")
     plt.ylabel("accuracy")
     plt.title(f"{dataset_to_use} : max iterations vs accuracy")
-    plt.legend(loc="upper left")
+    plt.legend(loc="lower right")
     plt.savefig(f"{dataset_to_use}_svm_{kernel}_validation.png")
 
 
@@ -72,19 +74,19 @@ def get_learning_curve(file_name, dataset_to_use, kernel):
         train_accuracy_data.append(train_accuracy)
 
     # get learning curves
-    plt.figure(1)
+    plt.figure()
     plt.plot(train_samples_list, train_accuracy_data, "-", label=f"train {kernel}")
     plt.plot(train_samples_list, test_accuracy_data, "-", label=f"test {kernel}")
     plt.xlabel("number of samples")
     plt.ylabel("accuracy ")
     plt.title(f"{dataset_to_use} : number training samples vs accuracy")
-    plt.legend(loc="upper left")
+    plt.legend(loc="lower right")
     plt.savefig(f"{dataset_to_use}_svm_{kernel}_learning.png")
 
 if __name__ == "__main__":
     dataset_to_use = sys.argv[1]
     file_name = sys.argv[2]
 
-    for kernel in ['rbf']:
+    for kernel in ['rbf', 'sigmoid']:
         get_validation_curve(file_name, dataset_to_use, kernel=kernel)
         get_learning_curve(file_name, dataset_to_use,  kernel=kernel)

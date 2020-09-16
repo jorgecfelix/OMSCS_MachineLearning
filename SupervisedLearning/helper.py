@@ -145,12 +145,12 @@ def plot_accuracy_vs_training_samples(num_samples, accuracies):
     plt.legend(loc="upper left")
     plt.savefig("")
 
-def get_dataset(dataset_number, file_name):
+def get_dataset(dataset_number, file_name, is_nn=False):
 
     if dataset_number == 'd1':
 
         print("\n Using Dataset 1, Phishing data classification...")
-        X, y = format_phishing_data(file_name)
+        X, y = format_phishing_data(file_name, is_nn=is_nn)
         train_samples_list = np.arange(100, 3050, 50)
 
     elif dataset_number == 'd2':

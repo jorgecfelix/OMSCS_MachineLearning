@@ -14,14 +14,15 @@ print(tf.__version__)
 
 
 
-def neural_net(X, y, num_samples=100):
+def neural_net(X, y, num_samples=None, epochs=10):
     print("\n :: Neural Net Classifier")
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0, test_size=0.4)
 
     # slice training data
-    X_train = X_train[:num_samples]
-    y_train = y_train[:num_samples]
+    if num_samples != None:
+        X_train = X_train[:num_samples]
+        y_train = y_train[:num_samples]
 
     # number of attributs
     num_attr = X.shape[1]
@@ -37,33 +38,76 @@ def neural_net(X, y, num_samples=100):
     keras.layers.Dense(1, activation='sigmoid')
     ])
 
-    print(model.summary())
+    # print(model.summary())
     # compile model
     model.compile(optimizer='adam',
               loss=tf.keras.losses.BinaryCrossentropy(),
               metrics=['accuracy'])
 
     # train model
-    model.fit(X_train, y_train, epochs=10)
+    model.fit(X_train, y_train, epochs=epochs)
 
 
     print(f" Number of training samples {X_train.shape[0]}")
     print("\n Test and Train Accuracy below")
     print(model.evaluate(X_test, y_test))
     print(model.evaluate(X_train, y_train))
+
+    return model.evaluate(X_train, y_train)[1], model.evaluate(X_test, y_test)[1]
+
+
+def get_validation_curve(file_name, dataset_to_use):
+
+    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name, is_nn=Truekids)
+
     
-    return model.evaluate(X_test, y_test)[1]
+    epochs = [x for x in range(1, 50, 5)]
+    test_accuracy_data = []
+    train_accuracy_data = []
+
+    for epoch in epochs:
+        train_accuracy, test_accuracy  = neural_net(X, y, epochs=epoch)
+        test_accuracy_data.append(test_accuracy)
+        train_accuracy_data.append(train_accuracy)
+
+    plt.figure()
+    plt.plot(epochs, train_accuracy_data, "-", label="train")
+    plt.plot(epochs, test_accuracy_data, "-", label="test")
+    plt.xlabel("epochs")
+    plt.ylabel("accuracy")
+    plt.title(f"{dataset_to_use} : epochs vs accuracy")
+    plt.legend(loc="upper left")
+    plt.savefig(f"{dataset_to_use}_neuralnet_validation.png")
+
+
+def get_learning_curve(file_name, dataset_to_use):
+    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name, is_nn=True)
+
+    
+    test_accuracy_data = []
+    train_accuracy_data = []
+
+    # using best ccp_alpha train decision tree on different number of samples
+    for num_samples in train_samples_list:
+        print(f'\n Number of training samples used => {num_samples}')
+        train_accuracy, test_accuracy = neural_net(X, y, num_samples=num_samples)
+        test_accuracy_data.append(test_accuracy)
+        train_accuracy_data.append(train_accuracy)
+
+    # get learning curves
+    plt.figure()
+    plt.plot(train_samples_list, train_accuracy_data, "-", label="train")
+    plt.plot(train_samples_list, test_accuracy_data, "-", label="test")
+    plt.xlabel("number of samples")
+    plt.ylabel("accuracy ")
+    plt.title(f"{dataset_to_use} : number training samples vs accuracy")
+    plt.legend(loc="upper left")
+    plt.savefig(f"{dataset_to_use}_neuralnet_learning.png")
 
 if __name__ == "__main__":
+    dataset_to_use = sys.argv[1]
+    file_name = sys.argv[2]
 
-    # dataset = helper.read_csv_data(sys.argv[1], delimiter=",", encode=False)
+    get_validation_curve(file_name, dataset_to_use)
+    get_learning_curve(file_name, dataset_to_use)
 
-    # X, y = helper.split_data(dataset, class_attr="class")
-
-    X, y = helper.format_phishing_data(sys.argv[1], is_nn=True)
-    # X, y = helper.format_bank_data(sys.argv[1])
-    training_samples_list = np.arange(100, X.shape[0], 50)
-
-    test_accuracy_list = [neural_net(X, y, num_samples=num_samples) for num_samples in training_samples_list]
-
-    helper.plot_accuracy_vs_training_samples(training_samples_list, [(test_accuracy_list, "neural network")])
