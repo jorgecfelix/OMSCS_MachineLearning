@@ -14,7 +14,7 @@ print(tf.__version__)
 
 
 
-def neural_net(X, y, num_samples=None, epochs=10):
+def neural_net(X, y, num_samples=None, epochs=15):
     print("\n :: Neural Net Classifier")
 
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0, test_size=0.4)
@@ -23,6 +23,11 @@ def neural_net(X, y, num_samples=None, epochs=10):
     if num_samples != None:
         X_train = X_train[:num_samples]
         y_train = y_train[:num_samples]
+
+    print( "\n Number of values per class attribute used to Train:")
+    print(y_train.value_counts())
+    print( "\n Number of values per class attribute used to Test:")
+    print(y_test.value_counts())
 
     # number of attributs
     num_attr = X.shape[1]
@@ -58,7 +63,7 @@ def neural_net(X, y, num_samples=None, epochs=10):
 
 def get_validation_curve(file_name, dataset_to_use):
 
-    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name, is_nn=Truekids)
+    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name, is_nn=True)
 
     
     epochs = [x for x in range(1, 50, 5)]

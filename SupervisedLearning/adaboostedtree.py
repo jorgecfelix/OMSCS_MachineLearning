@@ -23,6 +23,11 @@ def ada_boosted_tree(X, y, ccp_alpha=0.0, num_samples=None, n_estimators=5):
         X_train = X_train[:num_samples]
         y_train = y_train[:num_samples]
 
+    print( "\n Number of values per class attribute used to Train:")
+    print(y_train.value_counts())
+    print( "\n Number of values per class attribute used to Test:")
+    print(y_test.value_counts())
+
     boosted_tree = AdaBoostClassifier(DecisionTreeClassifier(max_depth=5),
                          algorithm="SAMME",
                          n_estimators=n_estimators)
@@ -37,32 +42,6 @@ def ada_boosted_tree(X, y, ccp_alpha=0.0, num_samples=None, n_estimators=5):
     print(f" Accuracy of test data : {test_accuracy}")
     print(f" Accuracy of train data : {train_accuracy}\n")
     return train_accuracy, test_accuracy
-
-
-def gradient_boosted_tree(X, y, ccp_alpha=0.0, num_samples=100):
-    print("\n :: Gradient Boosted Tree")
-
-    # split data
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
-
-    # slice training data
-    X_train = X_train[:num_samples]
-    y_train = y_train[:num_samples]
-
-    boosted_tree = GradientBoostingClassifier(n_estimators=5, learning_rate=1.0,
-                                              max_depth=2, random_state=0,
-                                              ccp_alpha=ccp_alpha)
-    boosted_tree.fit(X_train, y_train)
-
-    test_accuracy = boosted_tree.score(X_test, y_test)
-    train_accuracy = boosted_tree.score(X_train, y_train)
-
-    print(f" Number of training samples {X_train.shape[0]}")
-    print(f" Number of test samples {X_test.shape[0]}")
-    print(f" Accuracy of test data : {test_accuracy}")
-    print(f" Accuracy of train data : {train_accuracy}\n")
-
-    return test_accuracy
 
 
 def get_validation_curve(file_name, dataset_to_use):
@@ -81,7 +60,7 @@ def get_validation_curve(file_name, dataset_to_use):
         train_accuracy_data.append(train_accuracy)
 
     # get validation curve
-    plt.figure(0)
+    plt.figure()
     plt.plot(num_estimators, train_accuracy_data, "-", label="train")
     plt.plot(num_estimators, test_accuracy_data, "-", label="test")
     plt.xlabel("number of estimators")
@@ -108,7 +87,7 @@ def get_learning_curve(file_name, dataset_to_use):
         train_accuracy_data.append(train_accuracy)
 
     # get learning curves
-    plt.figure(1)
+    plt.figure()
     plt.plot(train_samples_list, train_accuracy_data, "-", label="train")
     plt.plot(train_samples_list, test_accuracy_data, "-", label="test")
     plt.xlabel("number of samples")

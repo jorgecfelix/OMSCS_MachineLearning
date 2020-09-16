@@ -24,6 +24,9 @@ def decision_tree_learning(X, y, num_samples=None, ccp_alpha=0.0):
         X_train = X_train[:num_samples]
         y_train = y_train[:num_samples]
 
+    print( "\n Number of values per class attribute used to Train:")
+    print(y_train.value_counts())
+
     # create decision tree classifier and fit to training data
     decision_tree = DecisionTreeClassifier(ccp_alpha=ccp_alpha, random_state=0)
 
@@ -53,6 +56,11 @@ def complex_post_prune_tree(X, y, dataset_to_use='d1'):
     """
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40)
 
+    print( "\n Number of values per class attribute used to Train:")
+    print(y_train.value_counts())
+    print( "\n Number of values per class attribute used to Test:")
+    print(y_test.value_counts())
+
     # NOTE: The higher the alpha the more the tree is pruned
     decision_tree = DecisionTreeClassifier(random_state=0)
     path = decision_tree.cost_complexity_pruning_path(X_train, y_train)
@@ -70,7 +78,7 @@ def complex_post_prune_tree(X, y, dataset_to_use='d1'):
 
     # get validation curve with different alphas
     # plot accuracy of test and train vs alpha used in decision tree to train
-    plt.figure(0)
+    plt.figure()
     plt.plot(ccp_alphas[:-1], train_scores[:-1], "-", label="train")
     plt.plot(ccp_alphas[:-1], test_scores[:-1], "-", label="test")
     plt.xlabel("effective alpha")
@@ -114,7 +122,7 @@ if __name__ == "__main__":
         train_accuracy_data.append(train_accuracy)
 
     # get learning curves
-    plt.figure(1)
+    plt.figure()
     plt.plot(train_samples_list, train_accuracy_data, "-", label="train")
     plt.plot(train_samples_list, test_accuracy_data, "-", label="test")
     plt.xlabel("number of samples")

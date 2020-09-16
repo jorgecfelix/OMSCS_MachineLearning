@@ -58,11 +58,7 @@ def format_phishing_data(file_name, is_nn=False):
     X = dataset.iloc[:, :-1]
     # get last column
     y = dataset.iloc[:,-1]
-
-    print( "\n Number of values per class attribute:")
-    print(y.value_counts())
-    # print(X)
-    
+   
     return X, y
     
 def format_swarm_data(file_name,):
@@ -72,14 +68,12 @@ def format_swarm_data(file_name,):
     X = dataset.drop(['Class'], axis=1)
     X = X.iloc[:, :120]
     y = dataset['Class']
-    
-    print(y.value_counts())
 
     return X, y
 
 def format_bank_data(file_name):
     dataset = read_csv_data(file_name, delimiter=";", encode=True, header=0)
-    print(dataset)
+    # print(dataset)
 
     X = dataset.iloc[:, :-1]
 
@@ -99,12 +93,16 @@ def format_cancer_data(file_name):
 
     y = dataset.iloc[:,-1]
 
-    print( "\n Number of values per class attribute:")
-    print(y.value_counts())
+    return X, y
+
+def format_census_data(file_name):
+    dataset = read_csv_data(file_name, delimiter=",", encode=True, header=None)
+
+    X = dataset.iloc[:, :-1]
+    y = dataset.iloc[:,-1]
 
     return X, y
 
-        
 def split_data(dataset, class_attr='class'):
     """ Function used to split class and attribute data into respective dataframes."""
 
@@ -160,8 +158,8 @@ def get_dataset(dataset_number, file_name, is_nn=False):
         train_samples_list = np.arange(100, 2712, 50)
 
     elif dataset_number == 'd3':
-        print("\n Using Dataset 3, Swarm data classification...")
-        X, y = format_swarm_data(file_name)
+        print("\n Using Dataset 3, Census Adult Data classification...")
+        X, y = format_census_data(file_name)
         train_samples_list = np.arange(100, 3000, 50)
 
     else:

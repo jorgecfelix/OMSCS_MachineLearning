@@ -18,6 +18,11 @@ def k_nearest_neighbors(X, y, neighbors=3, num_samples=None):
         X_train = X_train[:num_samples]
         y_train = y_train[:num_samples]
 
+    print( "\n Number of values per class attribute used to Train:")
+    print(y_train.value_counts())
+    print( "\n Number of values per class attribute used to Test:")
+    print(y_test.value_counts())
+
     knn = KNeighborsClassifier(n_neighbors=neighbors)
 
     knn.fit(X_train, y_train)
@@ -47,7 +52,7 @@ def get_validation_curve(file_name, dataset_to_use):
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
     # get learning curves
-    plt.figure(0)
+    plt.figure()
     plt.plot(neighbors_list, train_accuracy_data, "-", label="train")
     plt.plot(neighbors_list, test_accuracy_data, "-", label="test")
     plt.xlabel("number of neigbors")
@@ -72,7 +77,7 @@ def get_learning_curve(file_name, dataset_to_use):
         train_accuracy_data.append(train_accuracy)
 
     # get learning curves
-    plt.figure(1)
+    plt.figure()
     plt.plot(train_samples_list, train_accuracy_data, "-", label="train")
     plt.plot(train_samples_list, test_accuracy_data, "-", label="test")
     plt.xlabel("number of samples")

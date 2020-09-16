@@ -19,6 +19,11 @@ def run_svm(X, y, num_samples=None, kernel='rbf', max_iter=10):
         X_train = X_train[:num_samples]
         y_train = y_train[:num_samples]
 
+    print( "\n Number of values per class attribute used to Train:")
+    print(y_train.value_counts())
+    print( "\n Number of values per class attribute used to Test:")
+    print(y_test.value_counts())
+
     # kernel{‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’}, default=’rbf’
     svm_classifier = svm.SVC(kernel=kernel, max_iter=max_iter)
     svm_classifier.fit(X_train, y_train)
