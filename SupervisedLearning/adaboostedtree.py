@@ -67,16 +67,7 @@ def gradient_boosted_tree(X, y, ccp_alpha=0.0, num_samples=100):
 
 def get_validation_curve(file_name, dataset_to_use):
 
-    if dataset_to_use == 'd1':
-        print("\n Using Dataset 1, Phishing data classification...")
-        X, y = helper.format_phishing_data(file_name)
-        train_samples = np.arange(100, 3050, 50)
-    elif dataset_to_use == 'd2':
-        print("\n Using Dataset 2, Bank loan data classification...")
-        X, y = helper.format_bank_data(file_name)
-        train_samples = np.arange(100, 2712, 50)
-    else:
-        print("not a valid dataset number please use d1 or d2")
+    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
 
     test_accuracy_data = []
     train_accuracy_data = []
@@ -103,23 +94,14 @@ def get_validation_curve(file_name, dataset_to_use):
 def get_learning_curve(file_name, dataset_to_use):
 
 
-    if dataset_to_use == 'd1':
-        print("\n Using Dataset 1, Phishing data classification...")
-        X, y = helper.format_phishing_data(file_name)
-        train_samples = np.arange(100, 3050, 50)
-    elif dataset_to_use == 'd2':
-        print("\n Using Dataset 2, Bank loan data classification...")
-        X, y = helper.format_bank_data(file_name)
-        train_samples = np.arange(100, 2712, 50)
-    else:
-        print("not a valid dataset number please use d1 or d2")
+    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
 
     
     test_accuracy_data = []
     train_accuracy_data = []
 
     # using best ccp_alpha train decision tree on different number of samples
-    for num_samples in train_samples:
+    for num_samples in train_samples_list:
         print(f'\n Number of training samples used => {num_samples}')
         train_accuracy, test_accuracy = ada_boosted_tree(X, y, num_samples=num_samples, n_estimators=20)
         test_accuracy_data.append(test_accuracy)
@@ -127,8 +109,8 @@ def get_learning_curve(file_name, dataset_to_use):
 
     # get learning curves
     plt.figure(1)
-    plt.plot(train_samples, train_accuracy_data, "-", label="train")
-    plt.plot(train_samples, test_accuracy_data, "-", label="test")
+    plt.plot(train_samples_list, train_accuracy_data, "-", label="train")
+    plt.plot(train_samples_list, test_accuracy_data, "-", label="test")
     plt.xlabel("number of samples")
     plt.ylabel("accuracy ")
     plt.title(f"{dataset_to_use} : number training samples vs accuracy")

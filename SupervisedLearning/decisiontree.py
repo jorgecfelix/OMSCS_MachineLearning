@@ -34,10 +34,10 @@ def decision_tree_learning(X, y, num_samples=None, ccp_alpha=0.0):
     train_accuracy = decision_tree.score(X_train, y_train)
 
     if DEBUG:
-        print(f" Number of training samples {X_train.shape[0]}")
-        print(f" Number of test samples {X_test.shape[0]}")
+        print(f" Number of training samples used {X_train.shape[0]}")
+        print(f" Number of test samples used for validation {X_test.shape[0]}")
 
-        print(f" Accuracy of test data : {test_accuracy}")
+        print(f" Accuracy of test data (validation): {test_accuracy}")
         # print(f" Accuracy of train data : {train_accuracy}\n")
     
     # return test and train accuracy
@@ -93,28 +93,21 @@ def plot_decision_tree(decision_tree):
 
 if __name__ == "__main__":
 
-    # get phising data
     dataset_to_use = sys.argv[1]
     file_name = sys.argv[2]
 
-    if dataset_to_use == 'd1':
-        print("\n Using Dataset 1, Phishing data classification...")
-        X, y = helper.format_phishing_data(file_name)
-        train_samples = np.arange(100, 3050, 50)
-    elif dataset_to_use == 'd2':
-        print("\n Using Dataset 2, Bank loan data classification...")
-        X, y = helper.format_bank_data(file_name)
-        train_samples = np.arange(100, 2712, 50)
-    else:
-        print("not a valid dataset number please use d1 or d2")
+    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
 
     test_accuracy_data = []
     train_accuracy_data = []
+    print(":: Decision Tree :: Running Complex Prune ")
     # complex post prune on data and get best alpha
     trees, ccp_alpha = complex_post_prune_tree(X, y, dataset_to_use=dataset_to_use)
-    
+
+    print(":: Decision Tree :: Running decision tree learning with best ccp alpha ... ")
+
     # using best ccp_alpha train decision tree on different number of samples
-    for num_samples in train_samples:
+    for num_samples in train_samples_list:
         print(f'\n Number of training samples used => {num_samples}')
         train_accuracy, test_accuracy = decision_tree_learning(X, y, num_samples=num_samples, ccp_alpha=ccp_alpha)
         test_accuracy_data.append(test_accuracy)
@@ -122,8 +115,8 @@ if __name__ == "__main__":
 
     # get learning curves
     plt.figure(1)
-    plt.plot(train_samples, train_accuracy_data, "-", label="train")
-    plt.plot(train_samples, test_accuracy_data, "-", label="test")
+    plt.plot(train_samples_list, train_accuracy_data, "-", label="train")
+    plt.plot(train_samples_list, test_accuracy_data, "-", label="test")
     plt.xlabel("number of samples")
     plt.ylabel("accuracy ")
     plt.title(f"{dataset_to_use} number training samples vs accuracy")

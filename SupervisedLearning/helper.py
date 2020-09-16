@@ -61,15 +61,16 @@ def format_phishing_data(file_name, is_nn=False):
 
     print( "\n Number of values per class attribute:")
     print(y.value_counts())
-    print(X)
+    # print(X)
     
     return X, y
     
 def format_swarm_data(file_name,):
 
     dataset = read_csv_data(file_name, delimiter=",", encode=False, header=0)
-    dataset = dataset[:1000]
+    dataset = dataset[:5000]
     X = dataset.drop(['Class'], axis=1)
+    X = X.iloc[:, :120]
     y = dataset['Class']
     
     print(y.value_counts())
@@ -87,7 +88,21 @@ def format_bank_data(file_name):
     return X, y
 
 def format_cancer_data(file_name):
-    pass
+    dataset = read_csv_data(file_name, delimiter=",", encode=False, header=None)
+
+    dataset.loc[dataset[10] == 2, 10] = 0# = dataset[10].apply
+    dataset.loc[dataset[10] == 4, 10] = 1
+
+    # drop first column containg id
+    X = dataset.drop(0, axis=1)
+    X = X.iloc[:, :-1]
+
+    y = dataset.iloc[:,-1]
+
+    print( "\n Number of values per class attribute:")
+    print(y.value_counts())
+
+    return X, y
 
         
 def split_data(dataset, class_attr='class'):
@@ -129,3 +144,29 @@ def plot_accuracy_vs_training_samples(num_samples, accuracies):
     plt.title(" Num of Training Samples vs Test Accuracy")
     plt.legend(loc="upper left")
     plt.savefig("")
+
+def get_dataset(dataset_number, file_name):
+
+    if dataset_number == 'd1':
+
+        print("\n Using Dataset 1, Phishing data classification...")
+        X, y = format_phishing_data(file_name)
+        train_samples_list = np.arange(100, 3050, 50)
+
+    elif dataset_number == 'd2':
+
+        print("\n Using Dataset 2, Bank loan data classification...")
+        X, y = format_bank_data(file_name)
+        train_samples_list = np.arange(100, 2712, 50)
+
+    elif dataset_number == 'd3':
+        print("\n Using Dataset 3, Swarm data classification...")
+        X, y = format_swarm_data(file_name)
+        train_samples_list = np.arange(100, 3000, 50)
+
+    else:
+        print("not a valid dataset number please use d1 or d2")
+        return
+    
+    return X, y, train_samples_list
+    
