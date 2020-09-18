@@ -30,10 +30,10 @@ def neural_net(X_train, X_test, y_train, y_test, num_samples=None, epochs=15):
     print(y_test.value_counts())
 
     # number of attributs
-    num_attr = X.shape[1]
+    num_attr = X_train.shape[1]
     print(num_attr)
 
-    print(X.shape, y.shape)
+    print(X_train.shape, y_train.shape)
     # create model
     model = keras.Sequential([
     keras.layers.Input(shape=(num_attr)),
@@ -65,7 +65,9 @@ def get_validation_curve(file_name, dataset_to_use):
 
     X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name, is_nn=True)
 
-    
+    # split training for cross validation
+    X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, test_size=0.40)
+
     epochs = [x for x in range(1, 50, 5)]
     test_accuracy_data = []
     train_accuracy_data = []

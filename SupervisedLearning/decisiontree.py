@@ -54,7 +54,8 @@ def complex_post_prune_tree(X_train, X_test, y_train, y_test, dataset_to_use='d1
         Get the alpha values and its impurites at each alpha,
         then train decision tree at each alpha.
     """
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40)
+    # split the training for cross validation
+    X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, test_size=0.40)
 
     print( "\n Number of values per class attribute used to Train:")
     print(y_train.value_counts())
@@ -93,16 +94,7 @@ def complex_post_prune_tree(X_train, X_test, y_train, y_test, dataset_to_use='d1
     return trees, best_ccp_alpha
 
 
-def plot_decision_tree(decision_tree):
-    _, ax = plt.subplots(figsize=(10, 10))  # whatever size you want
-    tree.plot_tree(decision_tree, ax=ax)
-    plt.show()
-
-
-if __name__ == "__main__":
-
-    dataset_to_use = sys.argv[1]
-    file_name = sys.argv[2]
+def get_validation_and_learning_curve(file_name, dataset_to_use):
 
     X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
 
@@ -130,3 +122,10 @@ if __name__ == "__main__":
     plt.title(f"{dataset_to_use} number training samples vs accuracy")
     plt.legend(loc="upper left")
     plt.savefig(f"{dataset_to_use}_decisiontree_learning.png")
+
+if __name__ == "__main__":
+
+    dataset_to_use = sys.argv[1]
+    file_name = sys.argv[2]
+
+    get_validation_and_learning_curve(file_name, dataset_to_use)

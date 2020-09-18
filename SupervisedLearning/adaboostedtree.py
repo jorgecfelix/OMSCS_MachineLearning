@@ -48,9 +48,12 @@ def get_validation_curve(file_name, dataset_to_use):
 
     X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
 
+    # split training for cross validation
+    X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, test_size=0.40)
+
     test_accuracy_data = []
     train_accuracy_data = []
-    num_estimators = [i for i in range(1,100)]
+    num_estimators = [i for i in range(1,200)]
 
     # run ada boosted on different num_estimators
     for n_estimator in num_estimators:

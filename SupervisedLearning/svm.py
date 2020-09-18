@@ -42,6 +42,8 @@ def get_validation_curve(file_name, dataset_to_use, kernel):
 
     X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
 
+    # split training for cross validation
+    X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, test_size=0.40)
 
     max_iter = [x for x in range(1, 100)]
     test_accuracy_data = []

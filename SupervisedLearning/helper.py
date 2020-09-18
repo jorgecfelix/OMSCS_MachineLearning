@@ -134,13 +134,13 @@ def get_dataset(dataset_number, file_name, is_nn=False):
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40, random_state=0)
 
-        train_samples_list = np.arange(100, X_train.shape[0], 500)
+        train_samples_list = np.arange(100, X_train.shape[0], 100)
 
     elif dataset_number == 'd2':
         print("\n Using Dataset 2, Census Adult Data classification...")
         X, y = format_census_data(file_name)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40, random_state=0)
-        train_samples_list = np.arange(100, X_train.shape[0], 500)
+        train_samples_list = np.arange(100, X_train.shape[0], 100)
 
     else:
         print("not a valid dataset number please use d1 or d2")
