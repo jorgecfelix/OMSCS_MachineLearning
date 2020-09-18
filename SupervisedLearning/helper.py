@@ -47,59 +47,41 @@ def encode_categorical_data(dataset):
 def format_phishing_data(file_name, is_nn=False):
     """ Helper function used to format fishing data"""
     dataset = read_csv_data(file_name, delimiter=",", encode=False)
-    dataset = dataset[:5000]
+    # dataset = dataset[:5000]
     # need to switch from -1,1 to 0,1 for binary classification
     if is_nn:
         dataset.loc[dataset[30] == -1, 30] = 0# = dataset[10].apply
         dataset.loc[dataset[30] == 1, 30] = 1
 
-    print(dataset)
+    print(dataset.info())
+    
     # get all columns except last
     X = dataset.iloc[:, :-1]
     # get last column
     y = dataset.iloc[:,-1]
-   
-    return X, y
-    
-def format_swarm_data(file_name,):
-
-    dataset = read_csv_data(file_name, delimiter=",", encode=False, header=0)
-    dataset = dataset[:5000]
-    X = dataset.drop(['Class'], axis=1)
-    X = X.iloc[:, :120]
-    y = dataset['Class']
-
+    print(y.value_counts())
     return X, y
 
-def format_bank_data(file_name):
+
+def format_bank_data(file_name, balance=False):
     dataset = read_csv_data(file_name, delimiter=";", encode=True, header=0)
-    # print(dataset)
+    print(dataset.info())
 
     X = dataset.iloc[:, :-1]
 
     y = dataset.iloc[:,-1]
+    print(y.value_counts())
 
     return X, y
 
-def format_cancer_data(file_name):
-    dataset = read_csv_data(file_name, delimiter=",", encode=False, header=None)
-
-    dataset.loc[dataset[10] == 2, 10] = 0# = dataset[10].apply
-    dataset.loc[dataset[10] == 4, 10] = 1
-
-    # drop first column containg id
-    X = dataset.drop(0, axis=1)
-    X = X.iloc[:, :-1]
-
-    y = dataset.iloc[:,-1]
-
-    return X, y
 
 def format_census_data(file_name):
     dataset = read_csv_data(file_name, delimiter=",", encode=True, header=None)
-
+    print(dataset.info())
+    dataset = dataset[:10000]
     X = dataset.iloc[:, :-1]
     y = dataset.iloc[:,-1]
+    print(y.value_counts())
 
     return X, y
 
@@ -149,22 +131,28 @@ def get_dataset(dataset_number, file_name, is_nn=False):
 
         print("\n Using Dataset 1, Phishing data classification...")
         X, y = format_phishing_data(file_name, is_nn=is_nn)
-        train_samples_list = np.arange(100, 3050, 50)
+
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40, random_state=0)
+
+        train_samples_list = np.arange(100, X_train.shape[0], 500)
 
     elif dataset_number == 'd2':
-
-        print("\n Using Dataset 2, Bank loan data classification...")
-        X, y = format_bank_data(file_name)
-        train_samples_list = np.arange(100, 2712, 50)
-
-    elif dataset_number == 'd3':
-        print("\n Using Dataset 3, Census Adult Data classification...")
+        print("\n Using Dataset 2, Census Adult Data classification...")
         X, y = format_census_data(file_name)
-        train_samples_list = np.arange(100, 3000, 50)
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40, random_state=0)
+        train_samples_list = np.arange(100, X_train.shape[0], 500)
 
     else:
         print("not a valid dataset number please use d1 or d2")
         return
     
-    return X, y, train_samples_list
-    
+    return X_train, X_test, y_train, y_test, train_samples_list
+
+
+def print_data_info():
+    print("\n\n:: Phishing Data ...")
+    X, y = format_phishing_data("datasets/phishing-website/dataset.data")
+    print("\n\n:: Bank Loan Approval Data ...")
+    X, y = format_bank_data("datasets/bank/bank.csv")
+    print("\n\n:: Census Data ...")
+    X, y = format_census_data("datasets/census/adult.data")

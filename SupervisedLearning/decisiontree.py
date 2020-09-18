@@ -13,11 +13,11 @@ import helper
 # global used for print statements
 DEBUG = True
 
-def decision_tree_learning(X, y, num_samples=None, ccp_alpha=0.0):
+def decision_tree_learning(X_train, X_test, y_train, y_test, num_samples=None, ccp_alpha=0.0):
 
     """ Function used to fit decision tree with a certain test size and ccp_alpha. """
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40, random_state=0)
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40, random_state=0)
 
     # slice training data
     if num_samples != None:
@@ -47,14 +47,14 @@ def decision_tree_learning(X, y, num_samples=None, ccp_alpha=0.0):
     return train_accuracy, test_accuracy
 
 
-def complex_post_prune_tree(X, y, dataset_to_use='d1'):
+def complex_post_prune_tree(X_train, X_test, y_train, y_test, dataset_to_use='d1'):
     """ Complex Post Pruning on decision tree,
         example retrieved from scikit-learn official documentation
 
         Get the alpha values and its impurites at each alpha,
         then train decision tree at each alpha.
     """
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40)
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40)
 
     print( "\n Number of values per class attribute used to Train:")
     print(y_train.value_counts())
@@ -104,20 +104,20 @@ if __name__ == "__main__":
     dataset_to_use = sys.argv[1]
     file_name = sys.argv[2]
 
-    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
+    X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
 
     test_accuracy_data = []
     train_accuracy_data = []
     print(":: Decision Tree :: Running Complex Prune ")
     # complex post prune on data and get best alpha
-    trees, ccp_alpha = complex_post_prune_tree(X, y, dataset_to_use=dataset_to_use)
+    trees, ccp_alpha = complex_post_prune_tree(X_train, X_test, y_train, y_test, dataset_to_use=dataset_to_use)
 
     print(":: Decision Tree :: Running decision tree learning with best ccp alpha ... ")
 
     # using best ccp_alpha train decision tree on different number of samples
     for num_samples in train_samples_list:
         print(f'\n Number of training samples used => {num_samples}')
-        train_accuracy, test_accuracy = decision_tree_learning(X, y, num_samples=num_samples, ccp_alpha=ccp_alpha)
+        train_accuracy, test_accuracy = decision_tree_learning(X_train, X_test, y_train, y_test, num_samples=num_samples, ccp_alpha=ccp_alpha)
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
 

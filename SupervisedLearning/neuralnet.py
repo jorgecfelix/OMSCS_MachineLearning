@@ -14,10 +14,10 @@ print(tf.__version__)
 
 
 
-def neural_net(X, y, num_samples=None, epochs=15):
+def neural_net(X_train, X_test, y_train, y_test, num_samples=None, epochs=15):
     print("\n :: Neural Net Classifier")
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0, test_size=0.4)
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0, test_size=0.4)
 
     # slice training data
     if num_samples != None:
@@ -63,7 +63,7 @@ def neural_net(X, y, num_samples=None, epochs=15):
 
 def get_validation_curve(file_name, dataset_to_use):
 
-    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name, is_nn=True)
+    X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name, is_nn=True)
 
     
     epochs = [x for x in range(1, 50, 5)]
@@ -71,7 +71,7 @@ def get_validation_curve(file_name, dataset_to_use):
     train_accuracy_data = []
 
     for epoch in epochs:
-        train_accuracy, test_accuracy  = neural_net(X, y, epochs=epoch)
+        train_accuracy, test_accuracy  = neural_net(X_train, X_test, y_train, y_test, epochs=epoch)
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
 
@@ -86,7 +86,7 @@ def get_validation_curve(file_name, dataset_to_use):
 
 
 def get_learning_curve(file_name, dataset_to_use):
-    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name, is_nn=True)
+    X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name, is_nn=True)
 
     
     test_accuracy_data = []
@@ -95,7 +95,7 @@ def get_learning_curve(file_name, dataset_to_use):
     # using best ccp_alpha train decision tree on different number of samples
     for num_samples in train_samples_list:
         print(f'\n Number of training samples used => {num_samples}')
-        train_accuracy, test_accuracy = neural_net(X, y, num_samples=num_samples)
+        train_accuracy, test_accuracy = neural_net(X_train, X_test, y_train, y_test, num_samples=num_samples)
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
 

@@ -11,12 +11,12 @@ from sklearn.model_selection import train_test_split
 import helper
 
 
-def ada_boosted_tree(X, y, ccp_alpha=0.0, num_samples=None, n_estimators=5):
+def ada_boosted_tree(X_train, X_test, y_train, y_test, ccp_alpha=0.0, num_samples=None, n_estimators=5):
     """ Function using scikit-learn's AdaBoostClassifier """
     print("\n :: Ada Boosted Tree")
 
     # split data
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40, random_state=0)
+    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.40, random_state=0)
 
     # slice training data
     if num_samples != None:
@@ -46,7 +46,7 @@ def ada_boosted_tree(X, y, ccp_alpha=0.0, num_samples=None, n_estimators=5):
 
 def get_validation_curve(file_name, dataset_to_use):
 
-    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
+    X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
 
     test_accuracy_data = []
     train_accuracy_data = []
@@ -55,7 +55,7 @@ def get_validation_curve(file_name, dataset_to_use):
     # run ada boosted on different num_estimators
     for n_estimator in num_estimators:
         print(f'\n Number of estimators used => {n_estimator}')
-        train_accuracy, test_accuracy = ada_boosted_tree(X, y, n_estimators=n_estimator)
+        train_accuracy, test_accuracy = ada_boosted_tree(X_train, X_test, y_train, y_test, n_estimators=n_estimator)
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
 
@@ -73,7 +73,7 @@ def get_validation_curve(file_name, dataset_to_use):
 def get_learning_curve(file_name, dataset_to_use):
 
 
-    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
+    X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
 
     
     test_accuracy_data = []
@@ -82,7 +82,7 @@ def get_learning_curve(file_name, dataset_to_use):
     # using best ccp_alpha train decision tree on different number of samples
     for num_samples in train_samples_list:
         print(f'\n Number of training samples used => {num_samples}')
-        train_accuracy, test_accuracy = ada_boosted_tree(X, y, num_samples=num_samples, n_estimators=20)
+        train_accuracy, test_accuracy = ada_boosted_tree(X_train, X_test, y_train, y_test, num_samples=num_samples, n_estimators=20)
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
 

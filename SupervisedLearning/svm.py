@@ -7,12 +7,11 @@ from sklearn.model_selection import train_test_split
 import helper
 from sklearn import svm
 
-FIGURE_NUM = 0
 
-def run_svm(X, y, num_samples=None, kernel='rbf', max_iter=10):
+def run_svm(X_train, X_test, y_train, y_test, num_samples=None, kernel='rbf', max_iter=10):
     print("\n :: SVM Classifier")
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0, test_size=0.4)
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0, test_size=0.4)
 
     # slice training data
     if num_samples != None:
@@ -41,7 +40,7 @@ def run_svm(X, y, num_samples=None, kernel='rbf', max_iter=10):
 
 def get_validation_curve(file_name, dataset_to_use, kernel):
 
-    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
+    X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
 
 
     max_iter = [x for x in range(1, 100)]
@@ -49,7 +48,7 @@ def get_validation_curve(file_name, dataset_to_use, kernel):
     train_accuracy_data = []
 
     for i in max_iter:
-        train_accuracy, test_accuracy  = run_svm(X, y, max_iter=i, kernel=kernel)
+        train_accuracy, test_accuracy  = run_svm(X_train, X_test, y_train, y_test, max_iter=i, kernel=kernel)
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
     
@@ -65,7 +64,7 @@ def get_validation_curve(file_name, dataset_to_use, kernel):
 
 
 def get_learning_curve(file_name, dataset_to_use, kernel):
-    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
+    X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
 
     
     test_accuracy_data = []
@@ -74,7 +73,7 @@ def get_learning_curve(file_name, dataset_to_use, kernel):
     # using best ccp_alpha train decision tree on different number of samples
     for num_samples in train_samples_list:
         print(f'\n Number of training samples used => {num_samples}')
-        train_accuracy, test_accuracy  = run_svm(X, y, num_samples=num_samples, max_iter=20, kernel=kernel)
+        train_accuracy, test_accuracy  = run_svm(X_train, X_test, y_train, y_test, num_samples=num_samples, max_iter=20, kernel=kernel)
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
 

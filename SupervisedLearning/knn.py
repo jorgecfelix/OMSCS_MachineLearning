@@ -8,10 +8,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 
-def k_nearest_neighbors(X, y, neighbors=3, num_samples=None):
+def k_nearest_neighbors(X_train, X_test, y_train, y_test, neighbors=3, num_samples=None):
     print(f"\n :: Knn Classifier with {neighbors} neighbors")
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0, test_size=0.40)
+    #X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0, test_size=0.40)
 
     # slice training data
     if num_samples != None:
@@ -40,7 +40,7 @@ def k_nearest_neighbors(X, y, neighbors=3, num_samples=None):
 
 def get_validation_curve(file_name, dataset_to_use):
 
-    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
+    X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
 
     
     neighbors_list = [x for x in range(1, 31)]
@@ -48,7 +48,7 @@ def get_validation_curve(file_name, dataset_to_use):
     train_accuracy_data = []
 
     for neighbor in neighbors_list:
-        train_accuracy, test_accuracy  = k_nearest_neighbors(X, y, neighbors=neighbor)
+        train_accuracy, test_accuracy  = k_nearest_neighbors(X_train, X_test, y_train, y_test, neighbors=neighbor)
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
     # get learning curves
@@ -63,7 +63,7 @@ def get_validation_curve(file_name, dataset_to_use):
 
 
 def get_learning_curve(file_name, dataset_to_use):
-    X, y, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
+    X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
 
     
     test_accuracy_data = []
@@ -72,7 +72,7 @@ def get_learning_curve(file_name, dataset_to_use):
     # using best ccp_alpha train decision tree on different number of samples
     for num_samples in train_samples_list:
         print(f'\n Number of training samples used => {num_samples}')
-        train_accuracy, test_accuracy = k_nearest_neighbors(X, y, num_samples=num_samples, neighbors=5)
+        train_accuracy, test_accuracy = k_nearest_neighbors(X_train, X_test, y_train, y_test, num_samples=num_samples, neighbors=5)
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
 
