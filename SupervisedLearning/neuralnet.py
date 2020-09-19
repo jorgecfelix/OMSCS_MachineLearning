@@ -70,11 +70,19 @@ def get_validation_curve(file_name, dataset_to_use):
     # split training for cross validation
     X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, test_size=0.40)
 
-    learning_rates = np.arange(0.0001, 0.0005, 0.0001)
+    learning_rates = [0.000001, 0.0000025, 0.000005, 0.0000075,
+                      0.00001, 0.000025, 0.00005, 0.000075,
+                      0.0001, 0.00025, 0.0005, 0.00075,
+                      0.001, 0.0025, 0.005, 0.0075,
+                      0.01, 0.025, 0.05, 0.075,
+                      0.1, 0.25, 0.5, 0.75, 
+                      1.0]#np.arange(0.0001, 0.005, 0.0001)
+
     test_accuracy_data = []
     train_accuracy_data = []
 
     for lr in learning_rates:
+        print(f"\n\n :: Neural Net :: Using learning rate =>  {lr}")
         train_accuracy, test_accuracy  = neural_net(X_train, X_test, y_train, y_test, learning_rate=lr)
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
@@ -83,10 +91,15 @@ def get_validation_curve(file_name, dataset_to_use):
     best_lr = learning_rates[test_accuracy_data.index(max(test_accuracy_data))]
     
     print(f"\n :: Neural Net :: Best learning rate to use is {best_lr}")
+    lr_index = list(range(len(learning_rates)))
 
     plt.figure()
-    plt.plot(learning_rates, train_accuracy_data, "-", label="train")
-    plt.plot(learning_rates, test_accuracy_data, "-", label="validation")
+    plt.plot(lr_index, train_accuracy_data, "-o", label="train")
+    plt.plot(lr_index, test_accuracy_data, "-o", label="validation")
+
+    plt.xticks(lr_index, learning_rates)
+    plt.locator_params(axis='x', nbins=8)
+
     plt.xlabel("learning rate")
     plt.ylabel("accuracy")
     plt.title(f"{dataset_to_use} : learning rate vs accuracy")
