@@ -53,18 +53,25 @@ def get_validation_curve(file_name, dataset_to_use):
         train_accuracy, test_accuracy  = k_nearest_neighbors(X_train, X_test, y_train, y_test, neighbors=neighbor)
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
-    # get learning curves
+
+    # get best neighbors to use
+    best_neighbor = neighbors_list[test_accuracy_data.index(max(test_accuracy_data))]
+    
+    print(f"\n :: KNN :: Best number of neighbors to use is {best_neighbor}")
+
+    # get validation curves
     plt.figure()
     plt.plot(neighbors_list, train_accuracy_data, "-", label="train")
-    plt.plot(neighbors_list, test_accuracy_data, "-", label="test")
+    plt.plot(neighbors_list, test_accuracy_data, "-", label="validation")
     plt.xlabel("number of neigbors")
     plt.ylabel("accuracy")
     plt.title(f"{dataset_to_use} : number of neighbors vs accuracy")
-    plt.legend(loc="upper left")
+    plt.legend(loc="lower right")
     plt.savefig(f"{dataset_to_use}_knn_validation.png")
+    
+    return best_neighbor
 
-
-def get_learning_curve(file_name, dataset_to_use):
+def get_learning_curve(file_name, dataset_to_use, neighbors=5):
     X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
 
     
@@ -74,7 +81,7 @@ def get_learning_curve(file_name, dataset_to_use):
     # using best ccp_alpha train decision tree on different number of samples
     for num_samples in train_samples_list:
         print(f'\n Number of training samples used => {num_samples}')
-        train_accuracy, test_accuracy = k_nearest_neighbors(X_train, X_test, y_train, y_test, num_samples=num_samples, neighbors=5)
+        train_accuracy, test_accuracy = k_nearest_neighbors(X_train, X_test, y_train, y_test, num_samples=num_samples, neighbors=neighbors)
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
 
@@ -84,13 +91,13 @@ def get_learning_curve(file_name, dataset_to_use):
     plt.plot(train_samples_list, test_accuracy_data, "-", label="test")
     plt.xlabel("number of samples")
     plt.ylabel("accuracy ")
-    plt.title(f"{dataset_to_use} : number training samples vs accuracy")
-    plt.legend(loc="upper left")
+    plt.title(f"{dataset_to_use} : training samples vs accuracy neighbors={neighbors}")
+    plt.legend(loc="lower right")
     plt.savefig(f"{dataset_to_use}_knn_learning.png")
 
 if __name__ == "__main__":
     dataset_to_use = sys.argv[1]
     file_name = sys.argv[2]
 
-    get_validation_curve(file_name, dataset_to_use)
-    get_learning_curve(file_name, dataset_to_use)
+    neighbors = get_validation_curve(file_name, dataset_to_use)
+    get_learning_curve(file_name, dataset_to_use, neighbors=neighbors)

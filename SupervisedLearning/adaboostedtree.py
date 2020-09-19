@@ -53,7 +53,7 @@ def get_validation_curve(file_name, dataset_to_use):
 
     test_accuracy_data = []
     train_accuracy_data = []
-    num_estimators = [i for i in range(1,200)]
+    num_estimators = [i for i in range(1,100)]
 
     # run ada boosted on different num_estimators
     for n_estimator in num_estimators:
@@ -62,18 +62,24 @@ def get_validation_curve(file_name, dataset_to_use):
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
 
+    # get best estimator used
+    best_n_estimator = num_estimators[test_accuracy_data.index(max(test_accuracy_data))]
+    
+    print(f"\n :: adaboost :: Best estimator to use is {best_n_estimator}")
+
     # get validation curve
     plt.figure()
     plt.plot(num_estimators, train_accuracy_data, "-", label="train")
-    plt.plot(num_estimators, test_accuracy_data, "-", label="test")
+    plt.plot(num_estimators, test_accuracy_data, "-", label="validation")
     plt.xlabel("number of estimators")
     plt.ylabel("accuracy ")
     plt.title(f"{dataset_to_use} : number of estimators vs accuracy")
     plt.legend(loc="upper left")
     plt.savefig(f"{dataset_to_use}_adaboostedtree_validation.png")
 
+    return best_n_estimator
 
-def get_learning_curve(file_name, dataset_to_use):
+def get_learning_curve(file_name, dataset_to_use, estimator=20):
 
 
     X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
@@ -85,7 +91,7 @@ def get_learning_curve(file_name, dataset_to_use):
     # using best ccp_alpha train decision tree on different number of samples
     for num_samples in train_samples_list:
         print(f'\n Number of training samples used => {num_samples}')
-        train_accuracy, test_accuracy = ada_boosted_tree(X_train, X_test, y_train, y_test, num_samples=num_samples, n_estimators=20)
+        train_accuracy, test_accuracy = ada_boosted_tree(X_train, X_test, y_train, y_test, num_samples=num_samples, n_estimators=estimator)
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
 
@@ -95,7 +101,7 @@ def get_learning_curve(file_name, dataset_to_use):
     plt.plot(train_samples_list, test_accuracy_data, "-", label="test")
     plt.xlabel("number of samples")
     plt.ylabel("accuracy ")
-    plt.title(f"{dataset_to_use} : number training samples vs accuracy")
+    plt.title(f"{dataset_to_use} : training samples vs accuracy estimators={estimator}")
     plt.legend(loc="upper left")
     plt.savefig(f"{dataset_to_use}_adaboostedtree_learning.png")
 
@@ -103,6 +109,6 @@ if __name__ == "__main__":
 
     file_name = sys.argv[2]
     dataset_to_use = sys.argv[1]
-    get_validation_curve(file_name, dataset_to_use)
+    estimator = get_validation_curve(file_name, dataset_to_use)
 
-    get_learning_curve(file_name, dataset_to_use)
+    get_learning_curve(file_name, dataset_to_use, estimator=estimator)

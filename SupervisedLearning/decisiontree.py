@@ -81,7 +81,7 @@ def complex_post_prune_tree(X_train, X_test, y_train, y_test, dataset_to_use='d1
     # plot accuracy of test and train vs alpha used in decision tree to train
     plt.figure()
     plt.plot(ccp_alphas[:-1], train_scores[:-1], "-", label="train")
-    plt.plot(ccp_alphas[:-1], test_scores[:-1], "-", label="test")
+    plt.plot(ccp_alphas[:-1], test_scores[:-1], "-", label="validation")
     plt.xlabel("effective alpha")
     plt.ylabel("Accuracy ")
     plt.title(f"{dataset_to_use} : ccp alpha vs accuracy")
@@ -119,7 +119,7 @@ def get_validation_and_learning_curve(file_name, dataset_to_use):
     plt.plot(train_samples_list, test_accuracy_data, "-", label="test")
     plt.xlabel("number of samples")
     plt.ylabel("accuracy ")
-    plt.title(f"{dataset_to_use} number training samples vs accuracy")
+    plt.title(f"{dataset_to_use} training samples vs accuracy ccp_alpha={ccp_alpha}")
     plt.legend(loc="upper left")
     plt.savefig(f"{dataset_to_use}_decisiontree_learning.png")
 

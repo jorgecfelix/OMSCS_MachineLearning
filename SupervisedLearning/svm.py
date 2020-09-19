@@ -54,18 +54,24 @@ def get_validation_curve(file_name, dataset_to_use, kernel):
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
     
-    # get learning curves
+    # get best neighbors to use
+    best_iteration = max_iter[test_accuracy_data.index(max(test_accuracy_data))]
+    
+    print(f"\n :: SVM :: Best number of iteration to use is {best_iteration}")
+
+    # get validation curve
     plt.figure()
     plt.plot(max_iter, train_accuracy_data, "-", label=f"train {kernel}")
-    plt.plot(max_iter, test_accuracy_data, "-", label=f"test {kernel}")
+    plt.plot(max_iter, test_accuracy_data, "-", label=f"validation {kernel}")
     plt.xlabel("max iterations")
     plt.ylabel("accuracy")
     plt.title(f"{dataset_to_use} : max iterations vs accuracy")
     plt.legend(loc="lower right")
     plt.savefig(f"{dataset_to_use}_svm_{kernel}_validation.png")
 
+    return best_iteration
 
-def get_learning_curve(file_name, dataset_to_use, kernel):
+def get_learning_curve(file_name, dataset_to_use, kernel, iterations=10):
     X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name)
 
     
@@ -75,7 +81,7 @@ def get_learning_curve(file_name, dataset_to_use, kernel):
     # using best ccp_alpha train decision tree on different number of samples
     for num_samples in train_samples_list:
         print(f'\n Number of training samples used => {num_samples}')
-        train_accuracy, test_accuracy  = run_svm(X_train, X_test, y_train, y_test, num_samples=num_samples, max_iter=20, kernel=kernel)
+        train_accuracy, test_accuracy  = run_svm(X_train, X_test, y_train, y_test, num_samples=num_samples, max_iter=iterations, kernel=kernel)
         test_accuracy_data.append(test_accuracy)
         train_accuracy_data.append(train_accuracy)
 
@@ -85,7 +91,7 @@ def get_learning_curve(file_name, dataset_to_use, kernel):
     plt.plot(train_samples_list, test_accuracy_data, "-", label=f"test {kernel}")
     plt.xlabel("number of samples")
     plt.ylabel("accuracy ")
-    plt.title(f"{dataset_to_use} : number training samples vs accuracy")
+    plt.title(f"{dataset_to_use} : training samples vs accuracy iterations={iterations}")
     plt.legend(loc="lower right")
     plt.savefig(f"{dataset_to_use}_svm_{kernel}_learning.png")
 
@@ -94,5 +100,5 @@ if __name__ == "__main__":
     file_name = sys.argv[2]
 
     for kernel in ['rbf', 'sigmoid']:
-        get_validation_curve(file_name, dataset_to_use, kernel=kernel)
-        get_learning_curve(file_name, dataset_to_use,  kernel=kernel)
+        iterations = get_validation_curve(file_name, dataset_to_use, kernel=kernel)
+        get_learning_curve(file_name, dataset_to_use,  kernel=kernel, iterations=iterations)
