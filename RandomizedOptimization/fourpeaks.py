@@ -1,32 +1,25 @@
 import mlrose_hiive as mlrose
 import numpy as np
 import matplotlib.pyplot as plt
-
 # Define a fitness function object.
 # Define an optimization problem object.
 # Select and run a randomized optimization algorithm.
- 
-# NOTE: This code is based on the tutorial from mlrose, modifed to fit a specific problem
-# NOTE: https://mlrose.readthedocs.io/en/stable/source/tutorial1.html
-
+# Define a fitness function object.
+# Define an optimization problem object.
+# Select and run a randomized optimization algorithm.
 
 def get_fitness_and_state():
-    num_colors = 2
-    num_nodes = 5
+    length = 100
     # initialize fitness function
-    edges = [(0,1), (0,2), (0,4), (1,3), (2,3), (2,4), (3,4)]
-    
-    fitness = mlrose.MaxKColor(edges)
+    fitness = mlrose.FourPeaks(t_pct=0.10)
     
     # define optimization problem
-    problem = mlrose.DiscreteOpt(length=num_nodes, fitness_fn=fitness, maximize=False, max_val=num_colors)
+    problem = mlrose.DiscreteOpt(length=length, fitness_fn=fitness, maximize=True, max_val=2)
     
-    # select random optimization problem
-    
-    
+    np.random.seed(1)
     # define initial state
-    init_state = np.array([1, 1, 1, 1, 1])
-
+    init_state = np.random.randint(2, size=length, dtype=np.int8)
+    
     return problem, init_state
 
 def random_hill_climbing(max_attempts=100, max_iters=100):
