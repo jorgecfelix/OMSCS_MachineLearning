@@ -31,7 +31,7 @@ def neural_net(X_train, X_test, y_train, y_test, num_samples=None, epochs=15, le
     model = mlrose.NeuralNetwork(hidden_nodes = [4, 4], activation = 'sigmoid', \
                                      algorithm = algorithm, max_iters = 100, \
                                      bias = True, is_classifier = True, learning_rate = learning_rate, \
-                                     early_stopping = True, clip_max = 5, max_attempts = 100, \
+                                     early_stopping = True, clip_max = 5, max_attempts = 10, \
                                      random_state = 3)
     
     model.fit(X_train, y_train)

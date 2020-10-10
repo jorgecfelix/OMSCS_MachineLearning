@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 # Define an optimization problem object.
 # Select and run a randomized optimization algorithm.
 
-def get_fitness_and_state():
-    length = 1000
+def get_fitness_and_state(problem_size=10):
+    length = problem_size
     # initialize fitness function
     fitness = mlrose.FlipFlop()
     
@@ -21,29 +21,30 @@ def get_fitness_and_state():
     return problem, init_state
 
 
-def random_hill_climbing(max_attempts=100, max_iters=100):
+def random_hill_climbing(problem_size=10, max_attempts=100, max_iters=100):
     """ Run random hill climbing for FourPeaks problem. """
 
-    problem, init_state = get_fitness_and_state()
+    problem, init_state = get_fitness_and_state(problem_size=problem_size)
 
     # select random optimization problem
     # solve the problem
-    best_state, best_fitness, fitness_curve = mlrose.random_hill_climb(problem, restarts=0,
+    best_state, best_fitness, fitness_curve = mlrose.random_hill_climb(problem, restarts=100,
                                                           max_attempts=max_attempts, max_iters=max_iters,
                                                           init_state=init_state, random_state=1, curve=True)
     print(f":: Best State: {best_state}")
     print(f":: Best Fitness: {best_fitness}")
-    
-    return fitness_curve
+    print(f":: Number of iterations {len(fitness_curve)}")
+
+    return fitness_curve, best_fitness, len(fitness_curve)
 
 
-def simulated_annealing(max_attempts=100, max_iters=100):
+def simulated_annealing(problem_size=10, max_attempts=100, max_iters=100):
     """ Run simulated annealing for k-color problem. """
 
-    problem, init_state = get_fitness_and_state()
+    problem, init_state = get_fitness_and_state(problem_size=problem_size)
 
     # define decay schedule
-    schedule = mlrose.ExpDecay()
+    schedule = mlrose.GeomDecay()
     
     # solve the problem
     best_state, best_fitness, fitness_curve = mlrose.simulated_annealing(problem, schedule=schedule,
@@ -51,29 +52,31 @@ def simulated_annealing(max_attempts=100, max_iters=100):
                                                           init_state=init_state, random_state=1, curve=True)
     print(f":: Best State: {best_state}")
     print(f":: Best Fitness: {best_fitness}")
+    print(f":: Number of iterations {len(fitness_curve)}")
 
-    return fitness_curve
+    return fitness_curve, best_fitness, len(fitness_curve)
 
 
-def genetic_algorithm(max_attempts=100, max_iters=100):
+def genetic_algorithm(problem_size=10, max_attempts=100, max_iters=100):
     """ Genetic Algorithm for Queens problem. """
     
-    problem, init_state = get_fitness_and_state()
+    problem, init_state = get_fitness_and_state(problem_size=problem_size)
     # select random optimization problem
     
     # solve the problem
     best_state, best_fitness, fitness_curve = mlrose.genetic_alg(problem,pop_size=200, mutation_prob=0.1,
-                                                     max_attempts=max_attempts, max_iters=max_iters,
+                                                     max_attempts=max_attempts, max_iters=max_iters, 
                                                      random_state=1, curve=True)
     print(f":: Best State: {best_state}")
     print(f":: Best Fitness: {best_fitness}")
+    print(f":: Number of iterations {len(fitness_curve)}")
 
-    return fitness_curve
+    return fitness_curve, best_fitness, len(fitness_curve)
 
-def mimic(max_attempts=100, max_iters=100):
+def mimic(problem_size=10, max_attempts=100, max_iters=100):
     """ Mimic for Queens problem. """
     
-    problem, init_state = get_fitness_and_state()
+    problem, init_state = get_fitness_and_state(problem_size=problem_size)
 
     # select random optimization problem
     
@@ -83,33 +86,42 @@ def mimic(max_attempts=100, max_iters=100):
                                                      random_state=1, curve=True)
     print(f":: Best State: {best_state}")
     print(f":: Best Fitness: {best_fitness}")
+    print(f":: Number of iterations {len(fitness_curve)}")
 
-    return fitness_curve
+    return fitness_curve, best_fitness, len(fitness_curve)
 
-if __name__ == "__main__":
-
+    
+def get_fitness_curve():
     print("\n:: FourPeaks Problem: ")
 
-    max_attempts=100
-    max_iters=100
+    max_attempts=10
+    max_iters=np.inf
+    problem_size = 100
 
     print("\n:: Random Hill Climbing... ")
-    fc_1 = random_hill_climbing(max_attempts=max_attempts, max_iters=max_iters)
+    fc_rhc, _, _ = random_hill_climbing(problem_size=problem_size, max_attempts=max_attempts, max_iters=max_iters)
 
     print("\n:: Simulated Annealing... ")
-    fc_2 = simulated_annealing(max_attempts=max_attempts, max_iters=max_iters)
+    fc_sa, _, _ = simulated_annealing(problem_size=problem_size, max_attempts=max_attempts, max_iters=max_iters)
 
     print("\n:: Genetic Algorithm... ")
-    fc_3 = genetic_algorithm(max_attempts=max_attempts, max_iters=max_iters)
+    fc_ga, _, _ = genetic_algorithm(problem_size=problem_size, max_attempts=max_attempts, max_iters=max_iters)
 
-    print("\n:: Mimic... ")
-    fc_4 = mimic(max_attempts=max_attempts, max_iters=max_iters)
+    #print("\n:: Mimic... ")
+    #fc_m, _, _ = mimic(max_attempts=max_attempts, max_iters=max_iters)
 
-    plt.plot(fc_1, label='rand_hc')
-    plt.plot(fc_2, label='sim_a')
-    plt.plot(fc_3, label='gen_alg')
-    plt.plot(fc_4, label='mimi')
+    plt.plot(fc_rhc, label='rand_hc')
+    plt.plot(fc_sa, label='sim_a')
+    plt.plot(fc_ga, label='gen_alg')
+    #plt.plot(fc_m, label='mimic')
     plt.legend(loc="lower right")
     plt.xlabel("iterations")
     plt.ylabel("fitness")
     plt.show()
+
+
+def get_fitness_vs_problem_size():
+    pass
+
+if __name__ == "__main__":
+    get_fitness_curve()
