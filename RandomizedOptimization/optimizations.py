@@ -1,11 +1,11 @@
 import mlrose_hiive as mlrose
 import numpy as np
 import matplotlib.pyplot as plt
-from problems import flip_flop, four_peaks, k_color, queens, ones_max
+from problems import flip_flop, four_peaks, k_color, ones_max
 
 
 def random_hill_climbing(problem, problem_size=10, max_attempts=100, max_iters=100):
-    """ Run random hill climbing for FourPeaks problem. """
+    """ Run random hill climbing """
 
     problem, init_state = problem(problem_size=problem_size)
 
@@ -21,13 +21,13 @@ def random_hill_climbing(problem, problem_size=10, max_attempts=100, max_iters=1
     return fitness_curve, best_fitness, len(fitness_curve)
 
 
-def simulated_annealing(problem, problem_size=10, max_attempts=100, max_iters=100):
-    """ Run simulated annealing for k-color problem. """
+def simulated_annealing(problem, problem_size=10, max_attempts=100, max_iters=100, decay=0.5):
+    """ Run simulated annealing """
 
     problem, init_state = problem(problem_size=problem_size)
 
     # define decay schedule
-    schedule = mlrose.GeomDecay()
+    schedule = mlrose.GeomDecay(init_temp=100, min_temp=0.001, decay=decay)
     
     # solve the problem
     best_state, best_fitness, fitness_curve = mlrose.simulated_annealing(problem, schedule=schedule,
@@ -41,7 +41,7 @@ def simulated_annealing(problem, problem_size=10, max_attempts=100, max_iters=10
 
 
 def genetic_algorithm(problem, problem_size=10, max_attempts=100, max_iters=100):
-    """ Genetic Algorithm for Queens problem. """
+    """ Genetic Algorithm. """
     
     problem, init_state = problem(problem_size=problem_size)
     # select random optimization problem
@@ -57,12 +57,12 @@ def genetic_algorithm(problem, problem_size=10, max_attempts=100, max_iters=100)
     return fitness_curve, best_fitness, len(fitness_curve)
 
 def mimic(problem, problem_size=10, max_attempts=100, max_iters=100):
-    """ Mimic for Queens problem. """
+    """ Mimic. """
     
     problem, init_state = problem(problem_size=problem_size)
 
     # select random optimization problem
-    
+
     # solve the problem
     best_state, best_fitness, fitness_curve = mlrose.mimic(problem,pop_size=200, keep_pct=0.2,
                                                      max_attempts=max_attempts, max_iters=max_iters,
@@ -75,8 +75,8 @@ def mimic(problem, problem_size=10, max_attempts=100, max_iters=100):
 
 def get_fitness_vs_iterations(problem_size):
 
-    max_attempts=10
-    max_iters=100
+    max_attempts=5
+    max_iters=np.inf
     problems = [ones_max, flip_flop, four_peaks, k_color]
     names = ['OnesMax', 'FlipFlop', 'FourPeaks', 'Kcolor']
 
@@ -109,9 +109,9 @@ def get_fitness_vs_iterations(problem_size):
 def get_fitness_vs_problem_size(sizes):
 
     problems = [ones_max, flip_flop, four_peaks, k_color]
-    names = ['OnesMax', 'FlipFlop', 'FourPeaks', 'Kcolor']
-    max_attempts = 10
-    max_iters = 100
+    names = ['OnesMax', 'FlipFlop', 'FourPeaks', 'kcolor']
+    max_attempts = 5
+    max_iters = np.inf
  
     for index, problem in enumerate(problems):
         print(f"\n\n:: {names[index]}... ")
@@ -159,7 +159,7 @@ def get_problem_size_vs_evals(sizes):
 
     problems = [ones_max, flip_flop, four_peaks, k_color]
     names = ['OnesMax', 'FlipFlop', 'FourPeaks', 'Kcolor']
-    max_attempts = 10
+    max_attempts = 5
     max_iters = np.inf
  
     for index, problem in enumerate(problems):
@@ -204,10 +204,39 @@ def get_problem_size_vs_evals(sizes):
         plt.ylabel("evaluations")
         plt.savefig(f"problemsize_vs_evals_{names[index]}.png")
     pass
+
+
+def tune_simulated_annealing():
+    print("\n:: Simulated Annealing Decay Tuning... ")
+    decays = np.arange(0.01, 1.0, 0.05)
+    problems = [ones_max, flip_flop, four_peaks, k_color]
+    names = ['OnesMax', 'FlipFlop', 'FourPeaks', 'Kcolor']
+    max_attempts = 100
+    max_iters = np.inf
+    problem_size = 100
+
+    for index, problem in enumerate(problems):
+        fitness_decay = []
     
+        for decay in decays:
+            fitness_curve, fit_sa, eval_sa = simulated_annealing(problem, problem_size=problem_size, max_attempts=max_attempts, max_iters=max_iters, decay=decay)
+            fitness_decay.append(fit_sa)
+        plt.figure()
+
+        plt.plot(decays, fitness_decay, label='sim_a')
+        plt.legend(loc="lower right")
+        plt.xlabel("decay")
+        plt.ylabel("fitness")
+        plt.savefig(f"decay_vs_fitness_{names[index]}.png")
+
+
 if __name__ == "__main__":
-    sizes = range(100, 1100, 100)
-    problem_size = 1000
+    np.random.seed(10)
+
+    sizes = range(10, 500, 10)
+    problem_size = 100
     get_fitness_vs_iterations(problem_size)
     get_fitness_vs_problem_size(sizes)
     get_problem_size_vs_evals(sizes)
+
+    # tune_simulated_annealing()
