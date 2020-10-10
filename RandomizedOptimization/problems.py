@@ -2,7 +2,7 @@ import mlrose_hiive as mlrose
 import numpy as np
 import matplotlib.pyplot as plt
 
-
+np.random.seed(1)
 def ones_max(problem_size=10):
     length = problem_size
 
@@ -11,7 +11,7 @@ def ones_max(problem_size=10):
     problem = mlrose.DiscreteOpt(length=length, fitness_fn=fitness, maximize=True, max_val=2)
 
     # define initial state
-    init_state = np.zeros(length, dtype=np.int8)
+    init_state = np.random.randint(2, size=length, dtype=np.int8)
     
     return problem, init_state
 
@@ -26,7 +26,7 @@ def flip_flop(problem_size=10):
     
     
     # define initial state
-    init_state = np.ones(length, dtype=np.int8)
+    init_state = np.random.randint(2, size=length, dtype=np.int8)
     
     return problem, init_state
 
@@ -45,22 +45,31 @@ def four_peaks(problem_size=10):
     
     return problem, init_state
 
-def k_color(problem_size=10):
+def k_color(problem_size=100):
     num_colors = 2
-    num_nodes = 5
+    num_nodes = problem_size
     # initialize fitness function
-    edges = [(0,1), (0,2), (0,4), (1,3), (2,3), (2,4), (3,4)]
-    
+    # created edges
+    #edges = [(0,1), (0,2), (0,4), (1,3), (2,3), (2,4), (3,4)]
+    edges = []
+    for i in range(num_nodes-1):
+        edges.append((i, i+1))
+        if i > 0 and i < num_nodes-3:
+            edges.append((i, i+2))
+            edges.append((i, i+3))
+
+    # print(edges)
+
     fitness = mlrose.MaxKColor(edges)
     
     # define optimization problem
-    problem = mlrose.DiscreteOpt(length=num_nodes, fitness_fn=fitness, maximize=False, max_val=num_colors)
+    problem = mlrose.DiscreteOpt(length=num_nodes, fitness_fn=fitness, maximize=True, max_val=num_colors)
     
     # select random optimization problem
     
     
     # define initial state
-    init_state = np.array([1, 1, 1, 1, 1])
+    init_state = np.random.randint(num_colors, size=num_nodes, dtype=np.int8)
 
     return problem, init_state
 
@@ -85,9 +94,9 @@ def queens(problem_size=10):
     fitness_custom = mlrose.CustomFitness(queens_max)
     
     # define optimization problem
-    problem = mlrose.DiscreteOpt(length=8, fitness_fn=fitness_custom, maximize=True, max_val=8)
+    problem = mlrose.DiscreteOpt(length=problem_size, fitness_fn=fitness_custom, maximize=True, max_val=problem_size)
     
     # define initial state
-    init_state = np.array([0, 1, 2, 3, 4, 5, 6, 7])
+    init_state = range(problem_size)
     
     return problem, init_state
