@@ -38,7 +38,6 @@ def neural_net(X_train, X_test, y_train, y_test, num_samples=None, epochs=15, le
     model = keras.Sequential([
     keras.layers.Input(shape=(num_attr)),
     keras.layers.Dense(4, activation='sigmoid'),
-    keras.layers.Dense(4, activation='sigmoid'),
     keras.layers.Dense(1, activation='sigmoid')
     ])
 

@@ -28,11 +28,13 @@ def neural_net(X_train, X_test, y_train, y_test, num_samples=None, epochs=15, le
     print(X_train.shape, y_train.shape)
 
     # Initialize neural network object and fit object
-    model = mlrose.NeuralNetwork(hidden_nodes = [4, 4], activation = 'sigmoid', \
-                                     algorithm = algorithm, max_iters = 100, \
+    model = mlrose.NeuralNetwork(hidden_nodes = [4], activation = 'sigmoid', \
+                                     algorithm = algorithm, max_iters = 1000, \
+                                     restarts=10, \
                                      bias = True, is_classifier = True, learning_rate = learning_rate, \
-                                     early_stopping = True, clip_max = 5, max_attempts = 10, \
-                                     random_state = 3)
+                                     early_stopping = True, max_attempts = 10, \
+                                     schedule=mlrose.GeomDecay(init_temp=100), pop_size=500, mutation_prob=0.25, \
+                                     random_state = 1)
     
     model.fit(X_train, y_train)
 
