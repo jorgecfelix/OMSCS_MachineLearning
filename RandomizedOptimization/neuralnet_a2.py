@@ -28,12 +28,12 @@ def neural_net(X_train, X_test, y_train, y_test, num_samples=None, epochs=15, le
     print(X_train.shape, y_train.shape)
 
     # Initialize neural network object and fit object
-    model = mlrose.NeuralNetwork(hidden_nodes = [4], activation = 'sigmoid', \
+    model = mlrose.NeuralNetwork(hidden_nodes = [4], activation = 'relu', \
                                      algorithm = algorithm, max_iters = 1000, \
-                                     restarts=10, \
+                                     restarts=10, clip_max=1, \
                                      bias = True, is_classifier = True, learning_rate = learning_rate, \
                                      early_stopping = True, max_attempts = 10, \
-                                     schedule=mlrose.GeomDecay(init_temp=100), pop_size=500, mutation_prob=0.25, \
+                                     schedule=mlrose.GeomDecay(init_temp=100), pop_size=200, mutation_prob=0.1, \
                                      random_state = 1)
     
     model.fit(X_train, y_train)
@@ -61,9 +61,7 @@ def get_validation_curve(file_name, dataset_to_use, algorithm='gradient_descent'
     # split training for cross validation
     X_train, X_test, y_train, y_test = train_test_split(X_train, y_train, test_size=0.40)
 
-    learning_rates = [0.000001, 0.0000025, 0.000005, 0.0000075,
-                      0.00001, 0.000025, 0.00005, 0.000075,
-                      0.0001, 0.00025, 0.0005, 0.00075,
+    learning_rates = [
                       0.001, 0.0025, 0.005, 0.0075,
                       0.01, 0.025, 0.05, 0.075,
                       0.1, 0.25, 0.5, 0.75, 
