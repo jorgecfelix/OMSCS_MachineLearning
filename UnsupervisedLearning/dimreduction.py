@@ -28,21 +28,21 @@ def apply_pca(X_train, X_test, y_train, y_test, n_components=2):
     print(new_X_train.shape)
     print(new_X_test.shape)
 
-    plt.figure()
-    plt.plot(pca.explained_variance_, "-o")
-    plt.xlabel("num components")
-    plt.ylabel("Explained Variance (Largest Eigenvalue) ")
-    plt.title(" Num of Components vs Explained Variance")
-    # plt.legend(loc="upper left")
-    plt.savefig(f"numcomponents_vs_explainedvariance_{dataset_to_use}.png")
+    #plt.figure()
+    #plt.plot(pca.explained_variance_, "-o")
+    #plt.xlabel("num components")
+    #plt.ylabel("Explained Variance (Largest Eigenvalue) ")
+    #plt.title(" Num of Components vs Explained Variance")
+    ## plt.legend(loc="upper left")
+    #plt.savefig(f"pca_numcomponents_vs_explainedvariance_{dataset_to_use}.png")
 
-    plt.figure()
-    plt.plot(pca.explained_variance_ratio_, "-o")
-    plt.xlabel("num components")
-    plt.ylabel("Explained Variance Ratio ")
-    plt.title(" Num of Components vs Explained Variance Ratio")
-    # plt.legend(loc="upper left")
-    plt.savefig(f"numcomponents_vs_explainedvariance_ratio_{dataset_to_use}.png")
+    #plt.figure()
+    #plt.plot(pca.explained_variance_ratio_, "-o")
+    #plt.xlabel("num components")
+    #plt.ylabel("Explained Variance Ratio ")
+    #plt.title(" Num of Components vs Explained Variance Ratio")
+    ## plt.legend(loc="upper left")
+    #plt.savefig(f"pca_numcomponents_vs_explainedvariance_ratio_{dataset_to_use}.png")
 
     return  pca.explained_variance_, new_X_train, new_X_test
 
@@ -53,10 +53,11 @@ def apply_ICA(X_train, X_test, y_train, y_test, n_components=2):
     print(f"\n\n Running ICA with n_components={n_components}")
     ica = decomposition.FastICA(n_components=n_components, whiten=True)
     ica.fit(X_train)
+
     new_X_train = ica.transform(X_train)
     new_X_test = ica.transform(X_test)
   
-    kurt = kurtosis(X_train)
+    kurt = kurtosis(new_X_train)
 
     print(f"Kurtosis: {kurt}")
     print(f"AVG Kurtosis: {mean(abs(kurt))}")
@@ -105,15 +106,7 @@ def apply_recursive_feature_elimination(X_train, X_test, y_train, y_test, n_comp
     new_X_train = selector.transform(X_train)
     new_X_test = selector.transform(X_test)
 
-    plt.figure()
-    plt.plot(selector.grid_scores_, "-o")
-    plt.xlabel("step")
-    plt.ylabel("Validation Score ")
-    plt.title(" Step vs Validation Score")
-    # plt.legend(loc="upper left")
-    plt.savefig(f"rfs_step_vs_validationscore_{dataset_to_use}.png")
-
-    return new_X_train, new_X_test
+    return selector.grid_scores_, new_X_train, new_X_test
 
 if __name__ == "__main__":
     
@@ -125,30 +118,49 @@ if __name__ == "__main__":
 
 
     exp_variance, _, _ = apply_pca(X_train, X_test, y_train, y_test, n_components=X_train.shape[1])
-    avg_kurtosis = []
 
-    for i in range(1, X_train.shape[1]):
+    plt.figure()
+    plt.plot(range(1, X_train.shape[1] + 1), exp_variance, "-o")
+    plt.xlabel("num components")
+    plt.ylabel("Explained Variance (Largest Eigenvalue) ")
+    plt.title(" Num of Components vs Explained Variance")
+    # plt.legend(loc="upper left")
+    plt.savefig(f"pca_numcomponents_vs_explainedvariance_{dataset_to_use}.png")
+
+
+
+    avg_kurtosis = []
+    for i in range(1, X_train.shape[1] + 1):
         k, _, _ = apply_ICA(X_train, X_test, y_train, y_test, n_components=i)
         avg_kurtosis.append(k)
 
     plt.figure()
-    plt.plot(avg_kurtosis, "-o")
+    plt.plot(range(1, X_train.shape[1] + 1), avg_kurtosis, "-o")
     plt.xlabel("num components")
     plt.ylabel("Avg Kurtosis ")
     plt.title(" Num of Components vs Avg Kurtosis")
     # plt.legend(loc="upper left")
-    plt.savefig(f"numcomponents_vs_avg_kurtosis_{dataset_to_use}.png")
+    plt.savefig(f"ica_numcomponents_vs_avg_kurtosis_{dataset_to_use}.png")
+
     ms_errors =[]
-    for i in range(1, X_train.shape[1]):
+    for i in range(1, X_train.shape[1] + 1):
         e, _, _ = apply_random_projection(X_train, X_test, y_train, y_test, n_components=i)
         ms_errors.append(e)
     
     plt.figure()
-    plt.plot(ms_errors, "-o")
+    plt.plot(range(1, X_train.shape[1] + 1), ms_errors, "-o")
     plt.xlabel("num components")
     plt.ylabel("Reconstruction Error")
     plt.title(" Num of Components vs Reconstruction Error")
     #plt.legend(loc="upper left")
-    plt.savefig(f"numcomponents_vs_msqe_{dataset_to_use}.png")
+    plt.savefig(f"rca_numcomponents_vs_msqe_{dataset_to_use}.png")
 
-    apply_recursive_feature_elimination(X_train, X_test, y_train, y_test, n_components=2)
+    scores, _, _ = apply_recursive_feature_elimination(X_train, X_test, y_train, y_test)
+
+    plt.figure()
+    plt.plot(scores, "-o")
+    plt.xlabel("step")
+    plt.ylabel("Validation Score ")
+    plt.title(" Step vs Validation Score")
+    # plt.legend(loc="upper left")
+    plt.savefig(f"rfe_step_vs_validationscore_{dataset_to_use}.png")
