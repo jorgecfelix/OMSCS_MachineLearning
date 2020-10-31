@@ -3,7 +3,8 @@ from scipy.stats import norm, kurtosis
 from statistics import mean 
 from sklearn import random_projection
 from sklearn.metrics import mean_squared_error
-
+from sklearn.feature_selection import RFECV
+from sklearn.tree import DecisionTreeClassifier
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -43,7 +44,8 @@ def apply_pca(X_train, X_test, y_train, y_test, n_components=2):
     # plt.legend(loc="upper left")
     plt.savefig(f"numcomponents_vs_explainedvariance_ratio_{dataset_to_use}.png")
 
-    return  pca.explained_variance_
+    return  pca.explained_variance_, new_X_train, new_X_test
+
 
 def apply_ICA(X_train, X_test, y_train, y_test, n_components=2):
 
@@ -51,17 +53,21 @@ def apply_ICA(X_train, X_test, y_train, y_test, n_components=2):
     print(f"\n\n Running ICA with n_components={n_components}")
     ica = decomposition.FastICA(n_components=n_components, whiten=True)
     ica.fit(X_train)
-    X_train = ica.transform(X_train)
-    X_test = ica.transform(X_test)
+    new_X_train = ica.transform(X_train)
+    new_X_test = ica.transform(X_test)
   
     kurt = kurtosis(X_train)
 
     print(f"Kurtosis: {kurt}")
     print(f"AVG Kurtosis: {mean(abs(kurt))}")
 
-    return  mean(abs(kurt))
+    return  mean(abs(kurt)), new_X_train, new_X_test
+
 
 def apply_random_projection(X_train, X_test, y_train, y_test, n_components=2):
+    """ Function used to apply Gaussian Random Projection
+        with num of components to data and return transformed train and test data. """
+    print(f"\n\n Running Gaussian Random Projection with n_components={n_components}")
 
     rand_proj = random_projection.GaussianRandomProjection(n_components=n_components, )
     rand_proj.fit(X_train)
@@ -80,10 +86,34 @@ def apply_random_projection(X_train, X_test, y_train, y_test, n_components=2):
 
     error = mean_squared_error(X_train, df_reconstructed_data)
     print(f"Mean Squared Error: {error}")
-    return error
+    return error, new_X_train, new_X_test
 
-def feature_rediuction():
-    pass
+def apply_recursive_feature_elimination(X_train, X_test, y_train, y_test, n_components=2):
+
+    """ Function used to apply Recursive Feature elimination
+         with num of components to data and return transformed train and test data. """
+    print(f"\n\n Running Recursive Feature elimination with n_components={n_components}")
+
+    decision_tree = DecisionTreeClassifier(random_state=0)
+    selector = RFECV(decision_tree, step=2, cv=2)
+    selector = selector.fit(X_train, y_train)
+
+    print(f"Supported Features:\n {selector.support_}")
+    print(f"Ranking:\n {selector.ranking_}")
+    print(f"Grid Scores:\n {selector.grid_scores_}")
+    
+    new_X_train = selector.transform(X_train)
+    new_X_test = selector.transform(X_test)
+
+    plt.figure()
+    plt.plot(selector.grid_scores_, "-o")
+    plt.xlabel("step")
+    plt.ylabel("Validation Score ")
+    plt.title(" Step vs Validation Score")
+    # plt.legend(loc="upper left")
+    plt.savefig(f"rfs_step_vs_validationscore_{dataset_to_use}.png")
+
+    return new_X_train, new_X_test
 
 if __name__ == "__main__":
     
@@ -94,23 +124,23 @@ if __name__ == "__main__":
     print(X_train.shape)
 
 
-    #exp_variance = apply_pca(X_train, X_test, y_train, y_test, n_components=X_train.shape[1])
+    exp_variance, _, _ = apply_pca(X_train, X_test, y_train, y_test, n_components=X_train.shape[1])
     avg_kurtosis = []
 
-    #for i in range(1, X_train.shape[1]):
-    #    k = apply_ICA(X_train, X_test, y_train, y_test, n_components=i)
-    #    avg_kurtosis.append(k)
-#
-    #plt.figure()
-    #plt.plot(avg_kurtosis, "-o")
-    #plt.xlabel("num components")
-    #plt.ylabel("Avg Kurtosis ")
-    #plt.title(" Num of Components vs Avg Kurtosis")
-    ## plt.legend(loc="upper left")
-    #plt.savefig(f"numcomponents_vs_avg_kurtosis_{dataset_to_use}.png")
+    for i in range(1, X_train.shape[1]):
+        k, _, _ = apply_ICA(X_train, X_test, y_train, y_test, n_components=i)
+        avg_kurtosis.append(k)
+
+    plt.figure()
+    plt.plot(avg_kurtosis, "-o")
+    plt.xlabel("num components")
+    plt.ylabel("Avg Kurtosis ")
+    plt.title(" Num of Components vs Avg Kurtosis")
+    # plt.legend(loc="upper left")
+    plt.savefig(f"numcomponents_vs_avg_kurtosis_{dataset_to_use}.png")
     ms_errors =[]
     for i in range(1, X_train.shape[1]):
-        e = apply_random_projection(X_train, X_test, y_train, y_test, n_components=i)
+        e, _, _ = apply_random_projection(X_train, X_test, y_train, y_test, n_components=i)
         ms_errors.append(e)
     
     plt.figure()
@@ -120,3 +150,5 @@ if __name__ == "__main__":
     plt.title(" Num of Components vs Reconstruction Error")
     #plt.legend(loc="upper left")
     plt.savefig(f"numcomponents_vs_msqe_{dataset_to_use}.png")
+
+    apply_recursive_feature_elimination(X_train, X_test, y_train, y_test, n_components=2)
