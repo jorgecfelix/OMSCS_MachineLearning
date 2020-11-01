@@ -45,16 +45,14 @@ def get_inertia_plot_nodimreduc(dataset_to_use, file_name, dimreduc=''):
 
         k, X_train, X_test = dimreduction.apply_ICA(i_X_train, i_X_test, y_train, y_test, n_components=n_components)
 
-        pass
     elif dimreduc == 'rca':
         # choose number of components for pca
         if dataset_to_use == 'd1':
-            n_components = 30
+            n_components = 20
         elif dataset_to_use == 'd2':
-            n_components = 11
+            n_components = 9
         e, X_train, X_test = dimreduction.apply_random_projection(i_X_train, i_X_test, y_train, y_test, n_components=n_components)
 
-        pass
     elif dimreduc == 'rfe':
         scores, X_train, X_test = dimreduction.apply_recursive_feature_elimination(i_X_train, i_X_test, y_train, y_test)
 

@@ -105,7 +105,7 @@ def apply_recursive_feature_elimination(X_train, X_test, y_train, y_test, n_comp
     
     new_X_train = selector.transform(X_train)
     new_X_test = selector.transform(X_test)
-
+    print(f"NEW shape {new_X_train.shape}")
     return selector.grid_scores_, new_X_train, new_X_test
 
 if __name__ == "__main__":
