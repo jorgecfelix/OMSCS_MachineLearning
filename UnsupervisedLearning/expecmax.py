@@ -1,5 +1,6 @@
 from sklearn import mixture
 import matplotlib.pyplot as plt
+import dimreduction
 import numpy as np
 import helper
 import sys
@@ -19,10 +20,49 @@ def run_gmm(X_train, X_test, y_train, y_test, n_components=2, cv='full'):
     print(f"AIC : {aic}")
     return bic, aic
 
-def run_gmm_nodimreduc(dataset_to_use, file_name, plot_type='bic'):    
+def run_gmm_nodimreduc(dataset_to_use, file_name, plot_type='bic', dimreduc=''):    
+
 
     cv_types = ['spherical', 'tied', 'diag', 'full']
-    X_train, X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name, is_nn=True)
+    i_X_train, i_X_test, y_train, y_test, train_samples_list = helper.get_dataset(dataset_to_use, file_name, is_nn=True)
+
+
+    if dimreduc == 'pca':
+        # choose number of components for pca
+        if dataset_to_use == 'd1':
+            n_components = 5
+        elif dataset_to_use == 'd2':
+            n_components = 2
+
+        # apply pca
+        exp_variance, X_train, X_test = dimreduction.apply_pca(i_X_train, i_X_test, y_train, y_test, n_components=n_components)
+
+    elif dimreduc == 'ica':
+        # choose number of components for pca
+        if dataset_to_use == 'd1':
+            n_components = 30
+        elif dataset_to_use == 'd2':
+            n_components = 2
+
+        k, X_train, X_test = dimreduction.apply_ICA(i_X_train, i_X_test, y_train, y_test, n_components=n_components)
+
+        pass
+    elif dimreduc == 'rca':
+        # choose number of components for pca
+        if dataset_to_use == 'd1':
+            n_components = 30
+        elif dataset_to_use == 'd2':
+            n_components = 11
+        e, X_train, X_test = dimreduction.apply_random_projection(i_X_train, i_X_test, y_train, y_test, n_components=n_components)
+
+        pass
+    elif dimreduc == 'rfe':
+        scores, X_train, X_test = dimreduction.apply_recursive_feature_elimination(i_X_train, i_X_test, y_train, y_test)
+
+    else:
+        X_train = i_X_train
+        X_test = i_X_test
+
     bics = []
     aics = []
     ncomps = range(1, 21)
@@ -47,13 +87,13 @@ def run_gmm_nodimreduc(dataset_to_use, file_name, plot_type='bic'):
         plt.ylabel("bic")
         plt.title(" Num of Components vs BIC")
         plt.legend(loc="upper right")
-        plt.savefig(f"numcomps_vs_bic_{dataset_to_use}.png")
+        plt.savefig(f"expecmax_{dimreduc}_numcomps_vs_bic_{dataset_to_use}.png")
     elif plot_type == 'aic':
         plt.xlabel("num components")
         plt.ylabel("aic")
         plt.title(" Num of Components vs AIC")
         plt.legend(loc="upper right")
-        plt.savefig(f"numcomps_vs_aic_{dataset_to_use}.png")
+        plt.savefig(f"expecmax_{dimreduc}_numcomps_vs_aic_{dataset_to_use}.png")
 
 
 if __name__ == "__main__":
@@ -61,5 +101,7 @@ if __name__ == "__main__":
     dataset_to_use = sys.argv[1]
     file_name = sys.argv[2]
 
-    run_gmm_nodimreduc(dataset_to_use, file_name, plot_type='bic')
-    run_gmm_nodimreduc(dataset_to_use, file_name, plot_type='aic')
+    for alg in ['', 'pca', 'ica', 'rca', 'rfe']:
+
+       run_gmm_nodimreduc(dataset_to_use, file_name, plot_type='bic', dimreduc=alg)
+       run_gmm_nodimreduc(dataset_to_use, file_name, plot_type='aic', dimreduc=alg)

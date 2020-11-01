@@ -70,7 +70,7 @@ def apply_random_projection(X_train, X_test, y_train, y_test, n_components=2):
         with num of components to data and return transformed train and test data. """
     print(f"\n\n Running Gaussian Random Projection with n_components={n_components}")
 
-    rand_proj = random_projection.GaussianRandomProjection(n_components=n_components, )
+    rand_proj = random_projection.GaussianRandomProjection(n_components=n_components )
     rand_proj.fit(X_train)
 
     new_X_train = rand_proj.transform(X_train)
