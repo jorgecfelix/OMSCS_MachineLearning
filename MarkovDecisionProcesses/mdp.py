@@ -1,6 +1,7 @@
 import gym
 import numpy as np
-import hiive.mdptoolbox as mdptoolbox
+import hiive.mdptoolbox.mdp, hiive.mdptoolbox.example
+import matplotlib.pyplot as plt
 from pprint import pprint
 from gym.envs.toy_text.frozen_lake import generate_random_map
 
@@ -53,6 +54,188 @@ def create_frozen_lake_P_and_R(size='FrozenLake-v0'):
     # return new P and R matrices
     return P, R
 
+def get_stats_list(stats):
+
+    errors = [stat['Error'] for stat in stats]
+    reward = [stat['Reward'] for stat in stats]
+    mean_v = [stat['Mean V'] for stat in stats]
+    times = [stat['Time'] for stat in stats]
+
+    return errors, reward, mean_v, times
+
+
+def run_forest_management(states=10, max_iter=1000, alg='pi', gamma=0.9):
+    print("\n Running forest management mdp example")
+    P, R = hiive.mdptoolbox.example.forest(S=states)
+
+
+    # print(P)
+    if alg == 'pi':
+        print(" starting policy iteration...")
+        policy_iter = hiive.mdptoolbox.mdp.PolicyIteration(P, R, gamma, max_iter=max_iter)
+        stats = policy_iter.run()
+
+    elif alg == 'vi':
+        print(" starting value iteration...")
+        val_iter = hiive.mdptoolbox.mdp.ValueIteration(P, R, gamma, max_iter=max_iter)
+        stats = val_iter.run()
+
+    # print stats
+    #pprint(stats)
+
+    errors, reward, mean_v, times = get_stats_list(stats)
+
+    plt.figure()
+    plt.plot(times, "-o", label='time')
+    plt.xlabel("iteration")
+    plt.ylabel("time")
+    plt.title(f" iteration vs time states={states}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"forestM_{alg}_iter_num_vs_time_s={states}.png")
+
+    plt.figure()
+    plt.plot(errors, "-o", label='error')
+    plt.xlabel("iteration")
+    plt.ylabel("error")
+    plt.title(f" iteration vs error states={states}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"forestM_{alg}_iter_num_vs_error_s={states}.png")
+
+    plt.figure()
+    plt.plot(reward, "-o", label='reward')
+    plt.xlabel("iteration")
+    plt.ylabel("reward")
+    plt.title(f" iteration vs reward states={states}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"forestM_{alg}_iter_num_vs_reward_s={states}.png")
+
+    plt.figure()
+    plt.plot(mean_v, "-o", label='meanV')
+    plt.xlabel("iteration")
+    plt.ylabel("mean V")
+    plt.title(f" iteration vs Mean V states={states}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"forestM_{alg}_iter_num_vs_meanV_s={states}.png")
+
+    return stats
+
+def run_forest_management_gamma(states=10, max_iter=1000, alg='pi', gamma=0.9):
+    print("\n Running forest management mdp example with change in gamma")
+    P, R = hiive.mdptoolbox.example.forest(S=states)
+
+
+    # print(P)
+    if alg == 'pi':
+        print(" starting policy iteration...")
+        policy_iter = hiive.mdptoolbox.mdp.PolicyIteration(P, R, gamma, max_iter=max_iter)
+        stats = policy_iter.run()
+
+    elif alg == 'vi':
+        print(" starting value iteration...")
+        val_iter = hiive.mdptoolbox.mdp.ValueIteration(P, R, gamma, max_iter=max_iter)
+        stats = val_iter.run()
+
+    # print stats
+    #pprint(stats)
+
+    errors, reward, mean_v, times = get_stats_list(stats)
+
+    plt.figure(0)
+    plt.plot(times, "-o", label=f"{gamma}")
+    plt.xlabel("iteration")
+    plt.ylabel("time")
+    plt.title(f" iteration vs time states={states}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"gamma_forestM_{alg}_iter_num_vs_time_s={states}.png")
+
+    plt.figure(1)
+    plt.plot(errors, "-o", label=f"{gamma}")
+    plt.xlabel("iteration")
+    plt.ylabel("error")
+    plt.title(f" iteration vs error states={states}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"gamma_forestM_{alg}_iter_num_vs_error_s={states}.png")
+
+    plt.figure(2)
+    plt.plot(reward, "-o", label=f"{gamma}")
+    plt.xlabel("iteration")
+    plt.ylabel("reward")
+    plt.title(f" iteration vs reward states={states}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"gamma_forestM_{alg}_iter_num_vs_reward_s={states}.png")
+
+    plt.figure(3)
+    plt.plot(mean_v, "-o", label=f"{gamma}")
+    plt.xlabel("iteration")
+    plt.ylabel("mean V")
+    plt.title(f" iteration vs Mean V states={states}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"gamma_forestM_{alg}_iter_num_vs_meanV_s={states}.png")
+
+    return stats
+
+
+def run_frozen_lake(size='FrozenLake8x8-v0',max_iter=1000, alg='pi', gamma=0.9):
+    print("\n Running frozen lake mdp example")
+    P, R = create_frozen_lake_P_and_R(size)
+    
+    if alg == 'pi':
+        print(" starting policy iteration")
+        policy_iter = hiive.mdptoolbox.mdp.PolicyIteration(P, R, gamma, max_iter=max_iter)
+        stats = policy_iter.run()
+    elif alg == 'vi':
+        print(" starting value iteration")
+        val_iter = hiive.mdptoolbox.mdp.ValueIteration(P, R, gamma, max_iter=max_iter)
+        stats = val_iter.run()
+    
+    # print stats
+    errors, reward, mean_v, times = get_stats_list(stats)
+
+    plt.figure()
+    plt.plot(times, "-o", label='time')
+    plt.xlabel("iteration")
+    plt.ylabel("time")
+    plt.title(f" iteration vs time")
+    plt.legend(loc="upper right")
+    plt.savefig(f"{size}_{alg}_iter_num_vs_time_gamma={gamma}.png")
+
+    plt.figure()
+    plt.plot(errors, "-o", label='error')
+    plt.xlabel("iteration")
+    plt.ylabel("error")
+    plt.title(f" iteration vs error gamma={gamma}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"{size}_{alg}_iter_num_vs_error_gamma={gamma}.png")
+
+    plt.figure()
+    plt.plot(reward, "-o", label='reward')
+    plt.xlabel("iteration")
+    plt.ylabel("reward")
+    plt.title(f" iteration vs reward gamma={gamma}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"{size}_{alg}_iter_num_vs_reward_gamma={gamma}.png")
+
+    plt.figure()
+    plt.plot(mean_v, "-o", label='meanV')
+    plt.xlabel("iteration")
+    plt.ylabel("mean V")
+    plt.title(f" iteration vs Mean V gamma={gamma}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"{size}_{alg}_iter_num_vs_meanV_gamma={gamma}.png")
+
 if __name__ == '__main__':
-    create_frozen_lake_P_and_R('FrozenLake-v0')
-    create_frozen_lake_P_and_R('FrozenLake8x8-v0')
+    #create_frozen_lake_P_and_R('FrozenLake-v0')
+    #create_frozen_lake_P_and_R('FrozenLake8x8-v0')
+    states = 10, 100, 1000
+
+    #for state in states:
+    #    run_forest_management(states=state)
+    #    run_forest_management(states=state, alg='vi')
+    gammas=[0.1, 0.2, 0.3, 0.4,  0.5, 0.6, 0.7, 0.8, 0.9]
+    for gamma in gammas:
+        run_forest_management_gamma(states=1000, alg='pi', gamma=gamma)
+
+    #run_frozen_lake('FrozenLake-v0')
+    #run_frozen_lake('FrozenLake8x8-v0')
+    #run_frozen_lake('FrozenLake-v0', alg='vi')
+    #run_frozen_lake('FrozenLake8x8-v0', alg='vi')
