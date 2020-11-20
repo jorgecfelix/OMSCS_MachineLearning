@@ -1,58 +1,9 @@
+import sys
 import gym
 import numpy as np
 import hiive.mdptoolbox.mdp, hiive.mdptoolbox.example
 import matplotlib.pyplot as plt
 from pprint import pprint
-from gym.envs.toy_text.frozen_lake import generate_random_map
-
-
-# print(gym.envs.registry.all())
-
-def create_frozen_lake_P_and_R(size='FrozenLake-v0'):
-
-    print(f"\n Creating {size} P and R matrices")
-    env = gym.make(size)
-    
-    print(f" Num states : {env.nS}")
-    print(f" Num actions : {env.nA}")
-    s = env.nS
-    a = env.nA
-
-    # pprint(env.P)
-    
-    # construct P and R to be used in mdptoolbox
-    
-    # initialize P and R with zeroes
-    P = np.zeros((a, s, s))
-    R = np.zeros((s, a))
-    
-    # loop through openai gym P environment given and construct P and R for mdptoolbox
-    for state in env.P:
-        for action in env.P[state]:
-            #print("\n\n")
-            for prob, sprime, reward, done in env.P[state][action]:
-                # print(prob,sprime, reward, done)
-                # populate P and R matrix
-                P[action][state][sprime] += prob
-                R[state][action] = reward
-    
-    # print(P)
-    # print(R)
-
-    # check for 0 rows in P matrix to get probability
-
-    print("\n Checking for zero probability lists in P matrix")
-    for action in P:
-        # print("\n")
-        # go through each prob_list and check for zeros sums in probability
-        for prob_list in action:
-            # print("\n")
-            # print(sum(prob_list))
-            if sum(prob_list) == 0.0:
-                print(f" Found at action {action} and list {prob_list}")
-                
-    # return new P and R matrices
-    return P, R
 
 def get_stats_list(stats):
 
@@ -65,7 +16,7 @@ def get_stats_list(stats):
 
 
 def run_forest_management(states=10, max_iter=1000, alg='pi', gamma=0.9):
-    print("\n Running forest management mdp example")
+    print(f"\n Running forest management mdp example with states={states}")
     P, R = hiive.mdptoolbox.example.forest(S=states)
 
 
@@ -74,11 +25,15 @@ def run_forest_management(states=10, max_iter=1000, alg='pi', gamma=0.9):
         print(" starting policy iteration...")
         policy_iter = hiive.mdptoolbox.mdp.PolicyIteration(P, R, gamma, max_iter=max_iter)
         stats = policy_iter.run()
-
+        policy = policy_iter.policy
+        V = policy_iter.V
     elif alg == 'vi':
         print(" starting value iteration...")
         val_iter = hiive.mdptoolbox.mdp.ValueIteration(P, R, gamma, max_iter=max_iter)
         stats = val_iter.run()
+        policy = val_iter.policy
+
+        V = val_iter.V
 
     # print stats
     #pprint(stats)
@@ -116,6 +71,23 @@ def run_forest_management(states=10, max_iter=1000, alg='pi', gamma=0.9):
     plt.title(f" iteration vs Mean V states={states}")
     plt.legend(loc="upper right")
     plt.savefig(f"forestM_{alg}_iter_num_vs_meanV_s={states}.png")
+    
+    plt.figure()
+    plt.plot(mean_v, "-o", label='meanV')
+    plt.xlabel("iteration")
+    plt.ylabel("mean V")
+    plt.title(f" iteration vs Mean V states={states}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"forestM_{alg}_iter_num_vs_meanV_s={states}.png")
+
+    plt.figure()
+    plt.plot(policy, "-o", label='policy')
+    plt.xlabel("state")
+    plt.ylabel("action")
+    plt.title(f" The Policy Actions at a given State states={states}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"forestM_{alg}_state_vs_action_s={states}.png")
+
 
     return stats
 
@@ -175,67 +147,18 @@ def run_forest_management_gamma(states=10, max_iter=1000, alg='pi', gamma=0.9):
     return stats
 
 
-def run_frozen_lake(size='FrozenLake8x8-v0',max_iter=1000, alg='pi', gamma=0.9):
-    print("\n Running frozen lake mdp example")
-    P, R = create_frozen_lake_P_and_R(size)
-    
-    if alg == 'pi':
-        print(" starting policy iteration")
-        policy_iter = hiive.mdptoolbox.mdp.PolicyIteration(P, R, gamma, max_iter=max_iter)
-        stats = policy_iter.run()
-    elif alg == 'vi':
-        print(" starting value iteration")
-        val_iter = hiive.mdptoolbox.mdp.ValueIteration(P, R, gamma, max_iter=max_iter)
-        stats = val_iter.run()
-    
-    # print stats
-    errors, reward, mean_v, times = get_stats_list(stats)
 
-    plt.figure()
-    plt.plot(times, "-o", label='time')
-    plt.xlabel("iteration")
-    plt.ylabel("time")
-    plt.title(f" iteration vs time")
-    plt.legend(loc="upper right")
-    plt.savefig(f"{size}_{alg}_iter_num_vs_time_gamma={gamma}.png")
-
-    plt.figure()
-    plt.plot(errors, "-o", label='error')
-    plt.xlabel("iteration")
-    plt.ylabel("error")
-    plt.title(f" iteration vs error gamma={gamma}")
-    plt.legend(loc="upper right")
-    plt.savefig(f"{size}_{alg}_iter_num_vs_error_gamma={gamma}.png")
-
-    plt.figure()
-    plt.plot(reward, "-o", label='reward')
-    plt.xlabel("iteration")
-    plt.ylabel("reward")
-    plt.title(f" iteration vs reward gamma={gamma}")
-    plt.legend(loc="upper right")
-    plt.savefig(f"{size}_{alg}_iter_num_vs_reward_gamma={gamma}.png")
-
-    plt.figure()
-    plt.plot(mean_v, "-o", label='meanV')
-    plt.xlabel("iteration")
-    plt.ylabel("mean V")
-    plt.title(f" iteration vs Mean V gamma={gamma}")
-    plt.legend(loc="upper right")
-    plt.savefig(f"{size}_{alg}_iter_num_vs_meanV_gamma={gamma}.png")
 
 if __name__ == '__main__':
-    #create_frozen_lake_P_and_R('FrozenLake-v0')
-    #create_frozen_lake_P_and_R('FrozenLake8x8-v0')
-    states = 10, 100, 1000
 
-    #for state in states:
-    #    run_forest_management(states=state)
-    #    run_forest_management(states=state, alg='vi')
+    alg = sys.argv[1]
+
+    states = 10, 100, 1000, 10000
+
+    for state in states:
+        run_forest_management(states=state, alg=alg)
+
     gammas=[0.1, 0.2, 0.3, 0.4,  0.5, 0.6, 0.7, 0.8, 0.9]
     for gamma in gammas:
-        run_forest_management_gamma(states=1000, alg='pi', gamma=gamma)
+        run_forest_management_gamma(states=1000, alg=alg, gamma=gamma)
 
-    #run_frozen_lake('FrozenLake-v0')
-    #run_frozen_lake('FrozenLake8x8-v0')
-    #run_frozen_lake('FrozenLake-v0', alg='vi')
-    #run_frozen_lake('FrozenLake8x8-v0', alg='vi')
