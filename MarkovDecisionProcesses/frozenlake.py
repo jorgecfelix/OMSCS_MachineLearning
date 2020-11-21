@@ -80,7 +80,7 @@ def run_frozen_lake(size='FrozenLake8x8-v0',max_iter=100, alg='pi', gamma=0.9):
     # print stats
     errors, reward, mean_v, times = get_stats_list(stats)
 
-    plt.figure(0)
+    plt.figure(10)
     plt.plot(times, "-o", label=f'{gamma}')
     plt.xlabel("iteration")
     plt.ylabel("time")
@@ -88,7 +88,7 @@ def run_frozen_lake(size='FrozenLake8x8-v0',max_iter=100, alg='pi', gamma=0.9):
     plt.legend(loc="upper right")
     plt.savefig(f"{size}_{alg}_iter_num_vs_time.png")
 
-    plt.figure(1)
+    plt.figure(11)
     plt.plot(errors, "-o", label=f'{gamma}')
     plt.xlabel("iteration")
     plt.ylabel("error")
@@ -96,7 +96,7 @@ def run_frozen_lake(size='FrozenLake8x8-v0',max_iter=100, alg='pi', gamma=0.9):
     plt.legend(loc="upper right")
     plt.savefig(f"{size}_{alg}_iter_num_vs_error.png")
 
-    plt.figure(2)
+    plt.figure(12)
     plt.plot(reward, "-o", label=f'{gamma}')
     plt.xlabel("iteration")
     plt.ylabel("reward")
@@ -104,13 +104,14 @@ def run_frozen_lake(size='FrozenLake8x8-v0',max_iter=100, alg='pi', gamma=0.9):
     plt.legend(loc="upper right")
     plt.savefig(f"{size}_{alg}_iter_num_vs_reward.png")
 
-    plt.figure(3)
+    plt.figure(13)
     plt.plot(mean_v, "-o", label=f'{gamma}')
     plt.xlabel("iteration")
     plt.ylabel("mean V")
     plt.title(f" iteration vs Mean V {size}")
     plt.legend(loc="upper right")
     plt.savefig(f"{size}_{alg}_iter_num_vs_meanV.png")
+
 
 if __name__ == '__main__':
     alg = sys.argv[1]

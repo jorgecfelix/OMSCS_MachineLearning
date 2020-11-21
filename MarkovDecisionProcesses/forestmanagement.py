@@ -55,6 +55,7 @@ def run_forest_management(states=10, max_iter=1000, alg='pi', gamma=0.9):
     plt.title(f" iteration vs error states={states}")
     plt.legend(loc="upper right")
     plt.savefig(f"forestM_{alg}_iter_num_vs_error_s={states}.png")
+    plt.close()
 
     plt.figure()
     plt.plot(reward, "-o", label='reward')
@@ -63,6 +64,7 @@ def run_forest_management(states=10, max_iter=1000, alg='pi', gamma=0.9):
     plt.title(f" iteration vs reward states={states}")
     plt.legend(loc="upper right")
     plt.savefig(f"forestM_{alg}_iter_num_vs_reward_s={states}.png")
+    plt.close()
 
     plt.figure()
     plt.plot(mean_v, "-o", label='meanV')
@@ -71,14 +73,8 @@ def run_forest_management(states=10, max_iter=1000, alg='pi', gamma=0.9):
     plt.title(f" iteration vs Mean V states={states}")
     plt.legend(loc="upper right")
     plt.savefig(f"forestM_{alg}_iter_num_vs_meanV_s={states}.png")
-    
-    plt.figure()
-    plt.plot(mean_v, "-o", label='meanV')
-    plt.xlabel("iteration")
-    plt.ylabel("mean V")
-    plt.title(f" iteration vs Mean V states={states}")
-    plt.legend(loc="upper right")
-    plt.savefig(f"forestM_{alg}_iter_num_vs_meanV_s={states}.png")
+    plt.close()
+
 
     plt.figure()
     plt.plot(policy, "-o", label='policy')
@@ -87,7 +83,7 @@ def run_forest_management(states=10, max_iter=1000, alg='pi', gamma=0.9):
     plt.title(f" The Policy Actions at a given State states={states}")
     plt.legend(loc="upper right")
     plt.savefig(f"forestM_{alg}_state_vs_action_s={states}.png")
-
+    plt.close()
 
     return stats
 
@@ -111,8 +107,7 @@ def run_forest_management_gamma(states=10, max_iter=1000, alg='pi', gamma=0.9):
     #pprint(stats)
 
     errors, reward, mean_v, times = get_stats_list(stats)
-
-    plt.figure(0)
+    plt.figure(10)
     plt.plot(times, "-o", label=f"{gamma}")
     plt.xlabel("iteration")
     plt.ylabel("time")
@@ -120,7 +115,7 @@ def run_forest_management_gamma(states=10, max_iter=1000, alg='pi', gamma=0.9):
     plt.legend(loc="upper right")
     plt.savefig(f"gamma_forestM_{alg}_iter_num_vs_time_s={states}.png")
 
-    plt.figure(1)
+    plt.figure(11)
     plt.plot(errors, "-o", label=f"{gamma}")
     plt.xlabel("iteration")
     plt.ylabel("error")
@@ -128,7 +123,7 @@ def run_forest_management_gamma(states=10, max_iter=1000, alg='pi', gamma=0.9):
     plt.legend(loc="upper right")
     plt.savefig(f"gamma_forestM_{alg}_iter_num_vs_error_s={states}.png")
 
-    plt.figure(2)
+    plt.figure(12)
     plt.plot(reward, "-o", label=f"{gamma}")
     plt.xlabel("iteration")
     plt.ylabel("reward")
@@ -136,7 +131,7 @@ def run_forest_management_gamma(states=10, max_iter=1000, alg='pi', gamma=0.9):
     plt.legend(loc="upper right")
     plt.savefig(f"gamma_forestM_{alg}_iter_num_vs_reward_s={states}.png")
 
-    plt.figure(3)
+    plt.figure(13)
     plt.plot(mean_v, "-o", label=f"{gamma}")
     plt.xlabel("iteration")
     plt.ylabel("mean V")
