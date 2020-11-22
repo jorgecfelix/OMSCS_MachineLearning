@@ -64,7 +64,7 @@ def get_stats_list(stats):
 
     return errors, reward, mean_v, times
 
-def run_frozen_lake(size='FrozenLake8x8-v0',max_iter=100, alg='pi', gamma=0.9):
+def run_frozen_lake(size='FrozenLake8x8-v0',max_iter=1000, alg='pi', gamma=0.9):
     print("\n Running frozen lake mdp example")
     P, R = create_frozen_lake_P_and_R(size)
     
@@ -76,7 +76,7 @@ def run_frozen_lake(size='FrozenLake8x8-v0',max_iter=100, alg='pi', gamma=0.9):
         print(" starting value iteration")
         val_iter = hiive.mdptoolbox.mdp.ValueIteration(P, R, gamma, max_iter=max_iter)
         stats = val_iter.run()
-    
+
     # print stats
     errors, reward, mean_v, times = get_stats_list(stats)
 
@@ -112,10 +112,64 @@ def run_frozen_lake(size='FrozenLake8x8-v0',max_iter=100, alg='pi', gamma=0.9):
     plt.legend(loc="upper right")
     plt.savefig(f"{size}_{alg}_iter_num_vs_meanV.png")
 
+def run_frozen_lake_ql(size='FrozenLake8x8-v0', value=0.99, gamma=0.9, epsilon=0.9, epsilon_decay=0.6, 
+                             alpha_decay=0.99, alpha=0.5, p='gamma' ):
+    print("\n Running frozen lake mdp example")
+    P, R = create_frozen_lake_P_and_R(size)
+
+
+    print(" starting QLearning")
+    if p == 'gamma':
+        qlearn = hiive.mdptoolbox.mdp.QLearning(P, R, gamma=value, epsilon=epsilon, epsilon_decay=epsilon_decay,
+                                             alpha_decay=alpha_decay, alpha=alpha )
+    elif p == 'epsilon':
+        qlearn = hiive.mdptoolbox.mdp.QLearning(P, R, gamma=gamma, epsilon=value, epsilon_decay=epsilon_decay,
+                                             alpha_decay=alpha_decay, alpha=alpha )
+    elif p == 'alpha':
+        qlearn = hiive.mdptoolbox.mdp.QLearning(P, R, gamma=gamma, epsilon=epsilon, epsilon_decay=epsilon_decay,
+                                             alpha_decay=alpha_decay, alpha=value )
+    stats = qlearn.run()
+
+
+    errors, reward, mean_v, times = get_stats_list(stats)
+    plt.figure(10)
+    plt.plot(times, "-", label=f"{gamma}")
+    plt.xlabel("iteration")
+    plt.ylabel("time")
+    plt.title(f" iteration vs time {size}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"{p}_{size}_ql_iter_num_vs_time.png")
+
+    plt.figure(11)
+    plt.plot(errors, "-", label=f"{gamma}")
+    plt.xlabel("iteration")
+    plt.ylabel("error")
+    plt.title(f" iteration vs error {size}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"{p}_{size}_ql_iter_num_vs_error.png")
+
+    plt.figure(13)
+    plt.plot(mean_v, "-", label=f"{gamma}")
+    plt.xlabel("iteration")
+    plt.ylabel("mean V")
+    plt.title(f" iteration vs Mean V {size}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"{p}_{size}_ql_iter_num_vs_meanV.png")
+
+    return stats
+
+
 
 if __name__ == '__main__':
     alg = sys.argv[1]
+    p = sys.argv[2]
 
-    gammas=[0.1, 0.2, 0.3, 0.4,  0.5, 0.6, 0.7, 0.8, 0.9]
-    for gamma in gammas:
-        run_frozen_lake('FrozenLake-v0', alg=alg, gamma=gamma)
+    if alg !='ql':
+        gammas=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+        for gamma in gammas:
+            run_frozen_lake('FrozenLake-v0', alg=alg, gamma=gamma)
+    else:
+        gammas=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
+
+        for gamma in gammas:
+            run_frozen_lake_ql('FrozenLake-v0', gamma=gamma, p=p)
