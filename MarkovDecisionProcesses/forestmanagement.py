@@ -156,8 +156,12 @@ def run_forest_management_ql(states=1000, value=0.99, gamma=0.99, epsilon=0.5, e
     elif p == 'alpha':
         qlearn = hiive.mdptoolbox.mdp.QLearning(P, R, gamma=gamma, epsilon=epsilon, epsilon_decay=epsilon_decay,
                                              alpha_decay=alpha_decay, alpha=value )
-    stats = qlearn.run()
+    else:
+        qlearn = hiive.mdptoolbox.mdp.QLearning(P, R, gamma=gamma, epsilon=epsilon, epsilon_decay=epsilon_decay,
+                                             alpha_decay=alpha_decay, alpha=alpha )
 
+    stats = qlearn.run()
+    policy = qlearn.policy
 
     errors, reward, mean_v, times = get_stats_list(stats)
     plt.figure(10)
@@ -184,27 +188,85 @@ def run_forest_management_ql(states=1000, value=0.99, gamma=0.99, epsilon=0.5, e
     plt.legend(loc="upper right")
     plt.savefig(f"{p}_forestM_ql_iter_num_vs_meanV.png")
 
+    plt.figure(14)
+    plt.plot(policy, "-", label='policy')
+    plt.xlabel("state")
+    plt.ylabel("action")
+    plt.title(f" The Policy Actions at a given State states={states}")
+    plt.legend(loc="upper right")
+    plt.savefig(f"{p}_forestM_ql_policy.png")
+
     return stats
 
+def run_forest_management_ql_states(states=1000, value=0.99, gamma=0.99, epsilon=0.5, epsilon_decay=0.6, 
+                             alpha_decay=0.99, alpha=0.6):
+    print("\n Running forest management mdp example with change in gamma")
+    P, R = hiive.mdptoolbox.example.forest(S=states)
 
+
+    print(" starting QLearning")
+    qlearn = hiive.mdptoolbox.mdp.QLearning(P, R, gamma=gamma, epsilon=epsilon, epsilon_decay=epsilon_decay,
+                                             alpha_decay=alpha_decay, alpha=alpha )
+
+    stats = qlearn.run()
+    policy = qlearn.policy
+
+    errors, reward, mean_v, times = get_stats_list(stats)
+    plt.figure(100)
+    plt.plot(reward, "-", label=f"{states}")
+    plt.xlabel("iteration")
+    plt.ylabel("reward")
+    plt.title(f" iteration vs reward ")
+    plt.legend(loc="upper right")
+    plt.savefig(f"forestM_ql_iter_num_vs_reward.png")
+
+    plt.figure(110)
+    plt.plot(times, "-", label=f"{states}")
+    plt.xlabel("iteration")
+    plt.ylabel("time")
+    plt.title(f" iteration vs time ")
+    plt.legend(loc="upper right")
+    plt.savefig(f"forestM_ql_iter_num_vs_time.png")
+
+    plt.figure(111)
+    plt.plot(errors, "-", label=f"{states}")
+    plt.xlabel("iteration")
+    plt.ylabel("error")
+    plt.title(f" iteration vs error ")
+    plt.legend(loc="upper right")
+    plt.savefig(f"forestM_ql_iter_num_vs_error.png")
+
+    plt.figure(113)
+    plt.plot(mean_v, "-", label=f"{states}")
+    plt.xlabel("iteration")
+    plt.ylabel("mean V")
+    plt.title(f" iteration vs Mean V")
+    plt.legend(loc="upper right")
+    plt.savefig(f"forestM_ql_iter_num_vs_meanV.png")
+
+    return
 
 
 if __name__ == '__main__':
 
     alg = sys.argv[1]
-    p = sys.argv[2]
 
     states = 10, 100, 1000, 10000
 
     if alg !='ql':
         for state in states:
             run_forest_management(states=state, alg=alg)
+    else:
+        for state in states:
+            run_forest_management_ql_states(states=state, value=0.99, gamma=0.99, epsilon=0.5, epsilon_decay=0.6, 
+                             alpha_decay=0.99, alpha=0.6)
 
     if alg !='ql':
         gammas=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
         for gamma in gammas:
             run_forest_management_gamma(states=1000, alg=alg, gamma=gamma)
     else:
+        p = sys.argv[2]
         gammas=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
         for gamma in gammas:

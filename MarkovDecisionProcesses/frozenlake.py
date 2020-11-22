@@ -162,13 +162,13 @@ def run_frozen_lake_ql(size='FrozenLake8x8-v0', value=0.99, gamma=0.9, epsilon=0
 
 if __name__ == '__main__':
     alg = sys.argv[1]
-    p = sys.argv[2]
 
     if alg !='ql':
         gammas=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
         for gamma in gammas:
             run_frozen_lake('FrozenLake-v0', alg=alg, gamma=gamma)
     else:
+        p = sys.argv[2]
         gammas=[0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 
         for gamma in gammas:
